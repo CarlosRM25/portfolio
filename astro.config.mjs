@@ -5,9 +5,9 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
-  // TODO(Carlos): set to the real deployment URL after the first Vercel deploy
-  // (used for canonical + Open Graph tags). Record the URL in CLAUDE.md too.
-  site: 'https://carlos-rubio-marroquin.vercel.app',
+  // Production URL — drives canonical + Open Graph tags.
+  // Swap this if a custom domain is added later.
+  site: 'https://portfolio-liart-rho-94.vercel.app',
   output: 'static',
 
   vite: {

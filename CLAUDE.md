@@ -4,9 +4,12 @@ Personal portfolio for Carlos Rubio-Marroquin. **Astro** static site, deployed o
 Scoped in the architecture chat; built in focused sessions (this file covers **the main page**; the `/demo` agent page is a later, separate session).
 
 ## Status
-**Scaffolded + main page built** (2026-09-06). Astro 7.3 + Tailwind v4 (`@tailwindcss/vite`, CSS-first config in `src/styles/global.css`), static output. All components + `src/data/*.ts` in place per the spec below; `npm run build` is clean. Résumé PDF, GitHub + LinkedIn URLs are wired in with Carlos's real values.
+**v1 shipped** (2026-09-06). Astro 7.3 + Tailwind v4 (`@tailwindcss/vite`, CSS-first config in `src/styles/global.css`), static output. All components + `src/data/*.ts` in place per the spec below; `npm run build` is clean. Résumé PDF, GitHub + LinkedIn URLs wired in with Carlos's real values.
 
-**Not yet done:** local git repo has an initial commit but **no GitHub remote / no push**, and **not deployed to Vercel** (build steps 6–7). After first deploy, set the real URL as `site` in `astro.config.mjs` (currently a placeholder) and record it here.
+- **Repo:** https://github.com/CarlosRM25/portfolio (`main`)
+- **Live:** https://portfolio-liart-rho-94.vercel.app — Vercel Hobby, auto-deploys on push to `main`. Random suffix because `portfolio` was taken; fine for v1 (custom domain is out of scope). Set as `site` in `astro.config.mjs`.
+
+**Next / optional:** fill in `repoUrl`/`demoUrl` on the project cards as those repos go live; Prettier + `prettier-plugin-astro` not installed yet; `/demo` page is a later session.
 
 Dev: `npm run dev` → http://localhost:4321. Node note: a transitive dep (`undici`) wants Node ≥ 22.19; local is 22.14 — warning only, build unaffected. Vercel uses its own Node.
 
