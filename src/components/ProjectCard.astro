@@ -1,0 +1,105 @@
+---
+import type { Project } from "../data/projects";
+
+interface Props {
+  project: Project;
+}
+const { project } = Astro.props;
+
+// Treat empty / whitespace-only strings in the data file as "not set".
+const clean = (v?: string) => (v && v.trim() ? v.trim() : undefined);
+const repo = clean(project.repoUrl);
+const demo = clean(project.demoUrl);
+const writeup = clean(project.writeupUrl);
+
+const statusStyles: Record<Project["status"], string> = {
+  live: "bg-green-50 text-green-700 ring-green-600/20",
+  building: "bg-accent-50 text-accent-700 ring-accent-600/20",
+  planned: "bg-stone-100 text-stone-600 ring-stone-500/20",
+};
+const statusLabel: Record<Project["status"], string> = {
+  live: "Live",
+  building: "Building",
+  planned: "Planned",
+};
+
+const links = [
+  repo && { label: "GitHub", href: repo },
+  demo && { label: "Live demo", href: demo },
+  writeup && { label: "Write-up", href: writeup },
+].filter(Boolean) as { label: string; href: string }[];
+---
+
+<article
+  class:list={[
+    "relative flex h-full flex-col rounded-xl border border-stone-200 bg-white p-6",
+    repo && "transition-shadow hover:shadow-md",
+  ]}
+>
+  <div class="flex items-start justify-between gap-3">
+    <h3 class="text-lg font-semibold tracking-tight text-stone-900">
+      {project.title}
+    </h3>
+    <span
+      class:list={[
+        "shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset",
+        statusStyles[project.status],
+      ]}
+    >
+      {statusLabel[project.status]}
+    </span>
+  </div>
+
+  <p class="mt-3 text-sm leading-relaxed text-stone-600">{project.blurb}</p>
+
+  <ul class="mt-4 flex flex-wrap gap-1.5">
+    {
+      project.stack.map((tech) => (
+        <li class="rounded-md bg-stone-100 px-2 py-1 text-xs font-medium text-stone-600">
+          {tech}
+        </li>
+      ))
+    }
+  </ul>
+
+  {
+    links.length > 0 && (
+      <div class="mt-5 flex flex-wrap gap-4 border-t border-stone-100 pt-4">
+        {links.map((link) => (
+          <a
+            href={link.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="relative z-10 inline-flex items-center gap-1 text-sm font-medium text-accent-700 underline-offset-2 hover:text-accent-900 hover:underline"
+          >
+            {link.label}
+            <svg
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              class="h-3.5 w-3.5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M7 17 17 7M8 7h9v9" />
+            </svg>
+          </a>
+        ))}
+      </div>
+    )
+  }
+
+  {
+    repo && (
+      <a
+        href={repo}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="absolute inset-0 rounded-xl"
+        aria-label={`${project.title} — GitHub repository`}
+      />
+    )
+  }
+</article>

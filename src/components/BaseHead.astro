@@ -1,0 +1,34 @@
+---
+/**
+ * <head> contents: charset, viewport, favicon, SEO + Open Graph meta.
+ * og:image is deferred for v1.
+ */
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "Carlos Rubio-Marroquin — Data Science",
+  description = "Carlos Rubio-Marroquin — data science student at the University of Washington. Projects in AI agents, analytics, and data visualization.",
+} = Astro.props;
+
+// Astro.site is set in astro.config.mjs; fall back gracefully if it isn't.
+const canonicalURL = Astro.site
+  ? new URL(Astro.url.pathname, Astro.site)
+  : undefined;
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<meta name="generator" content={Astro.generator} />
+
+<title>{title}</title>
+<meta name="description" content={description} />
+{canonicalURL && <link rel="canonical" href={canonicalURL} />}
+
+<meta property="og:type" content="website" />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+{canonicalURL && <meta property="og:url" content={canonicalURL} />}

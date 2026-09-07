@@ -1,0 +1,52 @@
+---
+import { profile } from "../data/profile";
+import SocialLinks from "./SocialLinks.astro";
+---
+
+<section
+  aria-labelledby="hero-name"
+  class="mx-auto max-w-5xl px-6 pt-16 pb-14 md:pt-24 md:pb-20"
+>
+  <div class="max-w-2xl">
+    <h1
+      id="hero-name"
+      class="text-4xl font-semibold tracking-tight text-stone-900 md:text-5xl"
+    >
+      {profile.name}
+    </h1>
+
+    <p class="mt-5 text-lg leading-relaxed text-stone-600 md:text-xl">
+      {profile.tagline}
+    </p>
+
+    {
+      profile.seeking && (
+        <p class="mt-3 text-sm font-medium text-accent-700">{profile.seeking}</p>
+      )
+    }
+
+    <div class="mt-8 flex flex-wrap items-center gap-3">
+      <a
+        href="#projects"
+        class="rounded-lg bg-accent-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-700"
+      >
+        View projects
+      </a>
+      <a
+        href={profile.resumePath}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="rounded-lg border border-stone-300 px-4 py-2.5 text-sm font-medium text-stone-800 transition-colors hover:border-accent-600 hover:text-accent-700"
+      >
+        Résumé
+      </a>
+      <SocialLinks class="ml-1" />
+    </div>
+
+    {
+      profile.context && (
+        <p class="mt-6 text-sm text-stone-500">{profile.context}</p>
+      )
+    }
+  </div>
+</section>

@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Design tokens
+   One accent colour (warm rust / terracotta); warm-grey neutrals come from
+   Tailwind's built-in `stone` scale used directly in markup.
+   accent-600 is AA on white (~5.4:1) — safe for body-size text and buttons.
+   --------------------------------------------------------------------------- */
+@theme {
+  --color-accent-50: #fdf4f0;
+  --color-accent-100: #f9e4da;
+  --color-accent-200: #f1c7b4;
+  --color-accent-600: #b4491f;
+  --color-accent-700: #8f3a19;
+  --color-accent-900: #571f0d;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* clear the sticky header when jumping to an anchor */
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    background-color: #ffffff;
+    color: var(--color-stone-800);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Visible, consistent focus ring everywhere. */
+  :focus-visible {
+    outline: 2px solid var(--color-accent-600);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+
+  ::selection {
+    background-color: var(--color-accent-100);
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}

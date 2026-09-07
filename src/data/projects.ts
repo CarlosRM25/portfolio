@@ -1,0 +1,32 @@
+export type Project = {
+  slug: string;
+  title: string;
+  blurb: string;
+  stack: string[];
+  repoUrl?: string;
+  demoUrl?: string;
+  writeupUrl?: string;
+  status: "live" | "building" | "planned";
+};
+
+export const projects: Project[] = [
+  {
+    slug: "agentic-data-analyst",
+    title: "Agentic Data-Analyst",
+    blurb:
+      "An AI agent that answers natural-language questions about Seattle building-energy data — it explores the schema, writes and runs its own SQL, calls a trained model, and draws charts, self-correcting on errors. Tool-use loop built directly on the Claude API.",
+    stack: ["Python", "Claude API", "SQL", "scikit-learn", "Plotly", "Cloud Run"],
+    repoUrl: "", // TODO
+    demoUrl: "", // TODO once the agent's §10 deploy is live
+    status: "building",
+  },
+  {
+    slug: "flask-cicd",
+    title: "Containerized Flask Service + CI/CD",
+    blurb:
+      "A small Flask service, Dockerized, with a GitHub Actions pipeline that lints and tests every PR and ships the image on merge to main.",
+    stack: ["Flask", "Docker", "GitHub Actions", "pytest"],
+    repoUrl: "", // TODO
+    status: "planned",
+  },
+];
