@@ -8,14 +8,15 @@ const { education, skills } = profile;
   aria-labelledby="about-heading"
   class="mx-auto max-w-5xl px-6 py-14 md:py-20"
 >
+  <div aria-hidden="true" class="h-0.5 w-8 rounded-full bg-accent"></div>
   <h2
     id="about-heading"
-    class="text-2xl font-semibold tracking-tight text-stone-900"
+    class="mt-4 text-2xl font-semibold tracking-tight text-heading"
   >
     About
   </h2>
 
-  <div class="mt-6 max-w-2xl space-y-4 leading-relaxed text-stone-600">
+  <div class="mt-6 max-w-2xl space-y-4 leading-relaxed text-body">
     <p>
       Carlos is a data science student at the University of Washington who works
       at the intersection of machine learning and data visualization, with a
@@ -31,17 +32,15 @@ const { education, skills } = profile;
 
   <div class="mt-12 grid gap-10 sm:grid-cols-2">
     <div>
-      <h3
-        class="text-xs font-semibold tracking-wider text-stone-500 uppercase"
-      >
+      <h3 class="text-xs font-semibold tracking-wider text-faint uppercase">
         Skills
       </h3>
       <dl class="mt-4 space-y-3">
         {
           skills.map((group) => (
-            <div class="grid grid-cols-[6.5rem_1fr] gap-3 text-sm">
-              <dt class="text-stone-500">{group.group}</dt>
-              <dd class="text-stone-800">{group.items.join(", ")}</dd>
+            <div class="grid grid-cols-1 gap-0.5 text-sm sm:grid-cols-[7rem_1fr] sm:gap-3">
+              <dt class="text-muted">{group.group}</dt>
+              <dd class="text-body">{group.items.join(", ")}</dd>
             </div>
           ))
         }
@@ -49,13 +48,11 @@ const { education, skills } = profile;
     </div>
 
     <div>
-      <h3
-        class="text-xs font-semibold tracking-wider text-stone-500 uppercase"
-      >
+      <h3 class="text-xs font-semibold tracking-wider text-faint uppercase">
         Education
       </h3>
-      <div class="mt-4 space-y-1 text-sm leading-relaxed text-stone-800">
-        <p class="font-medium text-stone-900">{education.school}</p>
+      <div class="mt-4 space-y-1 text-sm leading-relaxed text-body">
+        <p class="font-medium text-heading">{education.school}</p>
         <p>{education.degree}</p>
         <p>Minor in {education.minor}</p>
         <p>{education.grad} · GPA {education.gpa}</p>

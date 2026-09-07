@@ -1,42 +1,63 @@
 @import "tailwindcss";
 
 /* ---------------------------------------------------------------------------
-   Design tokens
-   One accent colour (warm rust / terracotta); warm-grey neutrals come from
-   Tailwind's built-in `stone` scale used directly in markup.
-   accent-600 is AA on white (~5.4:1) — safe for body-size text and buttons.
+   Design tokens — warm dark theme
+   The site is committed to a single dark look: a warm near-black ground with
+   one terracotta accent. Neutrals are a custom warm-grey ramp (not Tailwind's
+   `stone`) so every surface sits on the same brown-black axis.
+
+   Contrast: --color-body / --color-muted / --color-faint / --color-heading and
+   the accent link colour (--color-accent-text) all clear WCAG AA on
+   --color-canvas (and on --color-band / --color-surface). --color-accent is a
+   large / UI fill and pairs with near-black button text (~5.3:1).
    --------------------------------------------------------------------------- */
 @theme {
-  --color-accent-50: #fdf4f0;
-  --color-accent-100: #f9e4da;
-  --color-accent-200: #f1c7b4;
-  --color-accent-600: #b4491f;
-  --color-accent-700: #8f3a19;
-  --color-accent-900: #571f0d;
+  /* Terracotta accent, tuned for a dark ground */
+  --color-accent: #e0653a; /* solid fill (buttons) — pair with near-black text */
+  --color-accent-hover: #f0946f; /* fill hover, brighter */
+  --color-accent-text: #ef8a63; /* accent as text / links on dark surfaces */
+  --color-accent-subtle: #2b1c14; /* accent-tinted surface (badges, pill) */
+
+  /* Warm neutral ramp, darkest → lightest */
+  --color-canvas: #17130f; /* page background */
+  --color-band: #1b1613; /* full-bleed section band (Projects) */
+  --color-surface: #26201b; /* raised cards */
+  --color-border: #38302b; /* hairlines */
+  --color-border-strong: #4d4239; /* hover borders */
+  --color-faint: #948881; /* tertiary text (still AA) */
+  --color-muted: #a79c94; /* secondary text, labels */
+  --color-body: #d8cfc8; /* body copy */
+  --color-heading: #f6f1ee; /* h1–h3 */
 }
 
 @layer base {
+  :root {
+    color-scheme: dark;
+  }
+
   html {
     scroll-behavior: smooth;
     /* clear the sticky header when jumping to an anchor */
     scroll-padding-top: 5rem;
+    background-color: var(--color-canvas);
   }
 
   body {
-    background-color: #ffffff;
-    color: var(--color-stone-800);
+    background-color: var(--color-canvas);
+    color: var(--color-body);
     -webkit-font-smoothing: antialiased;
   }
 
   /* Visible, consistent focus ring everywhere. */
   :focus-visible {
-    outline: 2px solid var(--color-accent-600);
+    outline: 2px solid var(--color-accent);
     outline-offset: 2px;
     border-radius: 3px;
   }
 
   ::selection {
-    background-color: var(--color-accent-100);
+    background-color: var(--color-accent-subtle);
+    color: var(--color-heading);
   }
 
   h1,

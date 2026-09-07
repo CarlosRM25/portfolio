@@ -8,6 +8,10 @@ export const profile = {
   // One-liner shown beneath the actions in the hero.
   context: "B.S. Informatics (Data Science) @ UW · Class of 2027",
   resumePath: "/resume.pdf",
+  // Hero portrait. Drop a 4:5 image at public/headshot.jpg (or .webp, ideally
+  // ~880×1100 or larger, face centred) and set this to "/headshot.jpg".
+  // While it's "" the hero shows a "cr" monogram placeholder.
+  headshot: "",
   links: {
     github: "https://github.com/CarlosRM25",
     linkedin:

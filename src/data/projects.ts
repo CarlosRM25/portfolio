@@ -3,6 +3,11 @@ export type Project = {
   title: string;
   blurb: string;
   stack: string[];
+  // Optional 2:1 thumbnail shown at the top of the card, e.g. a screenshot of
+  // the agent's output or an architecture diagram. Put files in
+  // public/projects/ and reference them as "/projects/<name>.png".
+  // Cards render a neutral placeholder panel until this is set.
+  image?: string;
   repoUrl?: string;
   demoUrl?: string;
   writeupUrl?: string;
