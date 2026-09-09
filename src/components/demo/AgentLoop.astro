@@ -1,0 +1,109 @@
+---
+/**
+ * The part of the project a screenshot can't show: the tool-use loop.
+ *
+ * Every answer on this page came out of these five tools being called in
+ * whatever order the model decided on, so the tool names are the copy — they
+ * are the most concrete thing about the project.
+ */
+const steps = [
+  {
+    tools: ["list_datasets", "describe_schema"],
+    title: "Reads the schema first",
+    body: "Before writing a line of SQL it asks what tables and columns exist, so it never guesses a column name.",
+  },
+  {
+    tools: ["run_sql"],
+    title: "Writes and runs its own query",
+    body: "Composes SQL against a read-only SQLite database behind a guardrail that blocks writes and caps result size.",
+  },
+  {
+    tools: ["predict"],
+    title: "Calls a trained model",
+    // Both splits, deliberately. 0.86 is the temporal split; 0.76 is the
+    // building-disjoint one, which is what a genuinely unseen building gets.
+    // The repo's model card leads with both and the predict tool returns the
+    // 0.76 caveat with every prediction — quoting only the flattering number
+    // here would contradict the code a recruiter can go read.
+    body: "For predictive questions it hands features to a scikit-learn classifier trained on the same data instead of guessing — ROC-AUC 0.86 on a temporal split, 0.76 on a building-disjoint one, which is the number that counts for a building the model has never seen.",
+  },
+  {
+    tools: ["make_chart"],
+    title: "Draws a chart when a chart is the answer",
+    body: "Emits a Plotly figure when the question is about a shape or a trend rather than a single number.",
+  },
+];
+
+const stats = [
+  { value: "38,309", label: "annual filings" },
+  { value: "3,871", label: "buildings" },
+  { value: "2015–2025", label: "covered" },
+  { value: "~$0.004", label: "per question" },
+];
+---
+
+<section aria-labelledby="how-heading" class="border-y border-border bg-band">
+  <div class="mx-auto max-w-5xl px-6 py-14 md:py-20">
+    <div aria-hidden="true" class="h-0.5 w-8 rounded-full bg-accent"></div>
+    <h2
+      id="how-heading"
+      class="mt-4 text-2xl font-semibold tracking-tight text-heading"
+    >
+      How it works
+    </h2>
+    <p class="mt-2 max-w-2xl text-muted">
+      There is no query template and no fixed pipeline. The model is given five
+      tools and decides for itself which to call, in what order, and when it has
+      enough to answer.
+    </p>
+
+    <ol class="mt-8 grid gap-px overflow-hidden rounded-xl bg-border md:grid-cols-2">
+      {
+        steps.map((step, i) => (
+          <li class="flex flex-col gap-2 bg-band p-5 md:p-6">
+            <div class="flex items-center gap-3">
+              <span class="text-xs font-semibold text-faint tabular-nums">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <div class="flex flex-wrap gap-1.5">
+                {step.tools.map((tool) => (
+                  <code class="rounded bg-accent-subtle px-1.5 py-0.5 font-mono text-xs text-accent-text">
+                    {tool}
+                  </code>
+                ))}
+              </div>
+            </div>
+            <h3 class="text-base font-medium text-heading">{step.title}</h3>
+            <p class="text-sm leading-relaxed text-muted">{step.body}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <p
+      class="mt-6 max-w-3xl border-l-2 border-accent pl-4 text-sm leading-relaxed text-body"
+    >
+      <strong class="font-medium text-heading">And when it gets it wrong:</strong
+      > a query that errors or comes back empty goes back into the loop as an observation,
+      the model reads the error and rewrites the query. That correction step is the
+      difference between an agent and a prompt.
+    </p>
+
+    <dl
+      class="mt-10 grid grid-cols-2 gap-6 border-t border-border pt-8 sm:grid-cols-4"
+    >
+      {
+        stats.map((stat) => (
+          <div>
+            <dt class="text-xs tracking-wide text-faint uppercase">
+              {stat.label}
+            </dt>
+            <dd class="mt-1 text-xl font-semibold tracking-tight text-heading">
+              {stat.value}
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</section>

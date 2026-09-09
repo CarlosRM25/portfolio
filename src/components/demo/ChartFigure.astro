@@ -1,0 +1,16 @@
+---
+/**
+ * Renders a chart spec from src/data/examples.json as inline SVG at build
+ * time. The live panel calls the same chartHTML() in the browser, so gallery
+ * and live answers draw identically.
+ */
+import { chartHTML, type ChartSpec } from "../../lib/chart-svg";
+
+interface Props {
+  spec: ChartSpec | null;
+}
+const { spec } = Astro.props;
+const html = spec ? chartHTML(spec) : "";
+---
+
+{html && <Fragment set:html={html} />}

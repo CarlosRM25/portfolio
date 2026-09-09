@@ -1,7 +1,7 @@
 # Portfolio Site — build notes for Claude Code
 
 Personal portfolio for Carlos Rubio-Marroquin. **Astro** static site, deployed on **Vercel**.
-Scoped in the architecture chat; built in focused sessions (this file covers **the main page**; the `/demo` agent page is a later, separate session).
+Scoped in the architecture chat; built in focused sessions. This file covers **the main page** and the **`/demo` agent page** (built 2026-09-08).
 
 ## Status
 **v1 shipped** (2026-09-06). Astro 7.3 + Tailwind v4 (`@tailwindcss/vite`, CSS-first config in `src/styles/global.css`), static output. All components + `src/data/*.ts` in place per the spec below; `npm run build` is clean. Résumé PDF, GitHub + LinkedIn URLs wired in with Carlos's real values.
@@ -9,12 +9,14 @@ Scoped in the architecture chat; built in focused sessions (this file covers **t
 - **Repo:** https://github.com/CarlosRM25/portfolio (`main`)
 - **Live:** https://portfolio-liart-rho-94.vercel.app — Vercel Hobby, auto-deploys on push to `main`. Random suffix because `portfolio` was taken; fine for v1 (custom domain is out of scope). Set as `site` in `astro.config.mjs`.
 
-**Next / optional:** fill in `repoUrl`/`demoUrl` on the project cards as those repos go live; Prettier + `prettier-plugin-astro` not installed yet; `/demo` page is a later session.
+**`/demo` shipped** (2026-09-08) — the agent's example gallery, restyled onto the site's chrome. The live "ask your own" half waits on the Cloud Run deploy. See **"The AI-agent demo"** below.
+
+**Next / optional:** the Flask/CI-CD card still has no `repoUrl` (a card with nothing to click); Prettier + `prettier-plugin-astro` not installed yet.
 
 Dev: `npm run dev` → http://localhost:4321. Node note: a transitive dep (`undici`) wants Node ≥ 22.19; local is 22.14 — warning only, build unaffected. Vercel uses its own Node.
 
 ## Stack & conventions
-- **Astro** (latest), **static output** — no SSR adapter for v1. The future `/demo` page fetches an external API client-side, so the site stays fully static.
+- **Astro** (latest), **static output** — no SSR adapter. `/demo` calls the agent API client-side, so the site stays fully static.
 - **TypeScript**, used lightly (data files, component props).
 - **Tailwind** — add with `npx astro add tailwind`; don't hand-roll the config.
 - Page data lives in `src/data/*.ts` (plain arrays/objects). Move to content collections only when project write-ups start.
@@ -30,18 +32,71 @@ portfolio/
     components/
       BaseHead.astro  SiteHeader.astro  SiteFooter.astro
       Hero.astro  ProjectList.astro  ProjectCard.astro  About.astro  SocialLinks.astro
-    data/profile.ts  data/projects.ts
-    styles/global.css
+      demo/AgentLoop.astro  demo/ExampleGallery.astro  demo/AskPanel.astro  demo/ChartFigure.astro
+    pages/demo.astro          # the agent demo
+    lib/answer-md.ts          # the agent's Markdown subset -> HTML
+    lib/plotly-figure.mjs     # Plotly data: URI -> figure spec
+    lib/chart-svg.mjs         # figure spec -> inline SVG (build time + runtime)
+    scripts/demo.ts           # /demo client: chart hover + live ask
+    data/profile.ts  data/projects.ts  data/examples.json
+    styles/global.css  styles/demo.css
   public/
     resume.pdf                # Carlos exports a current one here
     favicon.svg
+  scripts/import-examples.mjs # `npm run examples` — pulls the gallery from the agent repo
   astro.config.mjs  tsconfig.json  package.json
   CLAUDE.md                   # this file
 ```
 `.claude/` and `Claude outputs/` already exist in this folder — see "Housekeeping".
 
 ## Related
-- `Claude outputs/analytics-agent-architecture.md` — the AI-agent project that gets a `/demo` page here later. Its **§10** defines how this frontend talks to the agent's Cloud Run backend (offline gallery first, live agent on click). **Out of scope for the main-page scaffold.**
+- `Claude outputs/analytics-agent-architecture.md` — the AI-agent project that gets a `/demo` page here. Its **§10** defines how this frontend talks to the agent's Cloud Run backend (offline gallery first, live agent on click). Plan is **"The AI-agent demo"** below.
+
+---
+
+## The AI-agent demo — `/demo` page
+
+**Goal:** the "Agentic Data-Analyst" project card links to a `/demo` page *on this site* where a recruiter reads pre-run examples and can ask the live agent a question. The backend is a separate thing (Flask on **Google Cloud Run**, repo `CarlosRM25/analytics-AI-Agent-`, local `../analytics-agent/`). This page is a static frontend that calls it over one `fetch`.
+
+### Current state (2026-09-08)
+**Built and shipping — gallery half only.** `/demo` exists, builds clean, and is wired to the project card. `PUBLIC_AGENT_API_URL` is unset, so the page renders the "not live yet" state of "Ask your own". See **"What was built"** below for how it differs from the original plan.
+- Agent repo is built through M9 and Dockerized, **but not deployed** — no GCP project/billing yet. The live half can't be wired until that happens; the gallery half can ship now.
+- Reference frontend already exists in the agent repo: `../analytics-agent/frontend/index.html` (self-contained vanilla-JS, offline-first) + `frontend/examples.json` (8 pre-run Q&A). **That page is the thing to port.**
+- This site: Astro 7.3, `output: 'static'`, no env vars used yet.
+
+### Decision — port it in (Option A)
+Build `src/pages/demo.astro` in **this** repo, restyled to match the site (BaseLayout, header/footer, `--color-accent-*`, site fonts). Do **not** deploy the agent's `frontend/` separately or iframe it — the recruiter stays on the portfolio and the demo looks like the portfolio. The agent repo's `frontend/` stays as the reference and the source of `examples.json`.
+*(Fallback, Option B: point `demoUrl` at a separately-hosted copy of `../analytics-agent/frontend/`. Only if porting is annoying. Loses the shared look + nav.)*
+
+### What was built
+Four sections on `src/pages/demo.astro`, all on `BaseLayout` so header/footer/tokens are shared: a hero with a back-link to `/#projects`, **How it works**, the **example gallery**, and **Ask your own**.
+
+- **`src/data/examples.json`** — generated, not copied. `npm run examples` (`scripts/import-examples.mjs`) reads `../analytics-agent/frontend/examples.json` and rewrites the charts (below). Same shape otherwise: `[{ id, question, answer, sql: string[], chart }]`. Imported by the page, so the gallery is bundled at build time and makes zero requests.
+- **Charts are inline SVG, not iframes.** The plan said `<iframe sandbox>` with the agent's `data:text/html` URI. That URI is a Plotly page that pulls ~4 MB from `cdn.plot.ly` at view time and paints on a **white** ground — it breaks the offline promise and punches white holes in a dark page. Instead:
+  - `src/lib/plotly-figure.mjs` pulls the traces + layout out of that HTML (`extractFigure`).
+  - `src/lib/chart-svg.mjs` draws them (`chartHTML`) — hairline grid, one accent series, endpoint label, crosshair tooltip, and a "Show the numbers" table view.
+  - Both run at build time for the gallery **and** in the browser for live answers, so the two look identical. If `extractFigure` ever fails on a future chart it returns `null` and the answer renders without one.
+- **The gallery is a tablist, not a stack.** Eight fully-expanded answers was ~8 screens nobody reads. Questions are a list (`role="tab"`, arrow-key navigable); one answer shows at a time. With JS off every panel is simply visible — an inline bootstrap collapses them during parse, so there's no flash.
+- **Ask your own has two build-time states.** `PUBLIC_AGENT_API_URL` decides which ships. Unset → an explanatory panel, no input (a form that accepts a question and then refuses it is worse than no form). Set → input + suggestion chips + thread. Both are in `AskPanel.astro`; there is no runtime branch and no dead JS.
+- **Live answers show the trace.** `steps[].tool` renders as `describe_schema → run_sql → run_sql → make_chart`, which makes the retry loop visible. The gallery can't do this yet — the agent's `examples.json` carries `sql` and `chart` but not `steps`.
+- **`POST ${API_BASE}/ask`** with `{ question }` — all four response shapes are handled (`answer`/`steps`/`usage`, `disabled`, `429 limited`, `error`), plus a 2-minute `AbortController` timeout and a network-failure message. See `src/scripts/demo.ts`.
+- **Cross-page wiring:** `SiteHeader.astro` nav hrefs are now root-relative (`/#projects`, not `#projects` — a bare fragment scrolls nowhere from `/demo`) and there's a `Demo` link with `aria-current`. `ProjectCard.astro` no longer forces `target="_blank"` on every link (it would have opened `/demo` in a new tab), the whole-card link follows the demo when there is one, and the empty thumbnail placeholder is gone — two identical grey panels read as a broken site.
+
+### How it shows up in Vercel
+- **No new Vercel project.** The existing `portfolio` project builds `main` and auto-deploys. `/demo` is just one more statically pre-rendered route → `https://portfolio-liart-rho-94.vercel.app/demo` (and any future custom domain). Build stays static — no adapter, no serverless functions, no config change.
+- **Env var:** Vercel → project `portfolio` → Settings → Environment Variables → add `PUBLIC_AGENT_API_URL` for **Production** (and **Preview** if you want live calls on PR deploys). Value = the Cloud Run URL once it exists, e.g. `https://analytics-agent-xxxxx-uw.a.run.app`. `PUBLIC_`-prefixed = Vite inlines it into client JS at **build time**, so after changing it you must **redeploy** (Deployments → ⋯ → Redeploy), not just save. Not a secret — the URL is public and protected by CORS + rate limits + Turnstile on the backend.
+- **Preview deploys** get their own origin (`https://portfolio-git-<branch>-<scope>.vercel.app`). The backend allows exactly one origin (below), so live calls fail there with a CORS error — the offline gallery still works. Fine for review; don't rely on "ask your own" on previews.
+- **Cost:** Vercel side stays $0 (static). All demo spend is Cloud Run + Claude API, capped by the agent's own controls.
+
+### The CORS coupling — one origin
+The backend sets `Access-Control-Allow-Origin` to the single value of its `CORS_ALLOWED_ORIGIN` env var. So when the agent is deployed:
+- Set `CORS_ALLOWED_ORIGIN` on Cloud Run to this site's **production** origin: `https://portfolio-liart-rho-94.vercel.app` (or the custom domain when there is one — **if the domain changes, update this on Cloud Run and redeploy the service**).
+- `localhost:4321` dev and preview deploys are not that origin → no live answers there unless you temporarily point `CORS_ALLOWED_ORIGIN` at localhost in the agent's `.env` while developing, or teach the backend an allowlist (a backend change — not planned).
+
+### Sequencing
+1. ~~**Now:** build `/demo` with the bundled gallery working and `PUBLIC_AGENT_API_URL` unset.~~ **Done 2026-09-08.** `projects.ts` has `demoUrl: "/demo"` and `status: "building"`.
+2. **When the agent is deployed** (its runbook: `../analytics-agent/deploy/MONITORING.md` + `cloudrun.yaml`; needs a GCP project + billing): set `CORS_ALLOWED_ORIGIN` on Cloud Run → this site's prod origin; set `PUBLIC_AGENT_API_URL` in Vercel → the Cloud Run URL; redeploy the portfolio. "Ask your own" goes live. Flip the card to `status: "live"`.
+3. **Keeping `examples.json` fresh:** it's generated in the agent repo (run the agent once in `DEPLOY_MODE=deployed`). Whenever it's regenerated — annual data refresh, or new example questions — re-import it here with `npm run examples` (not `cp`: the script re-extracts the charts) and commit the result.
 
 ---
 
@@ -145,8 +200,8 @@ export const projects: Project[] = [
 
 ---
 
-## Out of scope for the main-page scaffold
-`/demo` agent page · blog / project deep-dives (MDX) · building dark mode from scratch · web analytics · custom domain (start on `*.vercel.app`) · contact form · animations · CMS.
+## Out of scope
+blog / project deep-dives (MDX) · building dark mode from scratch · web analytics · custom domain (start on `*.vercel.app`) · contact form · animations · CMS.
 
 ## Build steps (first session)
 1. `npm create astro@latest` in `portfolio/` — pick the **minimal / basics** starter, TypeScript "Strict". The wizard warns the folder isn't empty; the existing `.claude/`, `Claude outputs/`, `CLAUDE.md` don't conflict — continue.
@@ -170,7 +225,8 @@ export const projects: Project[] = [
 - **Planning docs:** kept in-repo, **gitignored** (`Claude outputs/` in `.gitignore`). Not moved out.
 
 ## Still open / next session
-- `git init` + initial commit done locally — **create the GitHub repo and push** (build step 6).
-- **Deploy on Vercel** (build step 7), then set the real URL as `site` in `astro.config.mjs` and record it here.
-- Add `repoUrl` / `demoUrl` to `src/data/projects.ts` as those go live (cards wire themselves up).
+- **The Flask/CI-CD card has no links.** `repoUrl` is still `""`, so it renders as a card you can't click — the only dead end left on the main page. Either create the repo and set `repoUrl`, or drop the card until it exists.
+- **Deploy the agent**, then: `CORS_ALLOWED_ORIGIN` on Cloud Run → this site's prod origin; `PUBLIC_AGENT_API_URL` in Vercel → the Cloud Run URL; redeploy. "Ask your own" goes live and the card flips to `status: "live"`.
+- **Put `steps` in the agent's `examples.json`.** The live panel shows the tool trace (`describe_schema → run_sql → …`); the gallery can't, because the export only carries `sql` and `chart`. Adding `steps` to the export would let all eight examples show the loop too — the best single upgrade left for this page.
+- Optional: add project card thumbnails (`public/projects/*.png`, referenced via `image?`). A screenshot of a `/demo` chart is the obvious one for the agent card.
 - Optional: Prettier + `prettier-plugin-astro` aren't installed yet (formatting convention only).

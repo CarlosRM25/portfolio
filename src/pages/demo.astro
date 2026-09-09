@@ -1,0 +1,101 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import AgentLoop from "../components/demo/AgentLoop.astro";
+import ExampleGallery from "../components/demo/ExampleGallery.astro";
+import AskPanel from "../components/demo/AskPanel.astro";
+import "../styles/demo.css";
+
+const repoUrl = "https://github.com/CarlosRM25/analytics-AI-Agent-";
+const isLive = Boolean(import.meta.env.PUBLIC_AGENT_API_URL);
+---
+
+<BaseLayout
+  title="Agentic Data Analyst — Carlos Rubio-Marroquin"
+  description="An AI agent that answers natural-language questions about Seattle's building-energy data — it reads the schema, writes and runs its own SQL, calls a trained model, draws charts, and corrects itself when a query fails."
+>
+  <section aria-labelledby="demo-heading" class="relative isolate overflow-hidden">
+    <div
+      aria-hidden="true"
+      class="pointer-events-none absolute -top-40 right-[-20%] -z-10 h-[30rem] w-[30rem] rounded-full bg-accent/10 blur-3xl sm:right-[-5%] md:right-[6%]"
+    >
+    </div>
+
+    <div class="mx-auto max-w-5xl px-6 pt-10 pb-14 md:pt-14 md:pb-20">
+      <a
+        href="/#projects"
+        class="inline-flex items-center gap-1.5 rounded-md text-sm text-muted transition-colors hover:text-accent-text"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+          class="h-4 w-4"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M15 18l-6-6 6-6" />
+        </svg>
+        All projects
+      </a>
+
+      <div class="mt-6 flex flex-wrap items-center gap-3">
+        <h1
+          id="demo-heading"
+          class="text-3xl font-semibold tracking-tight text-heading md:text-4xl"
+        >
+          Agentic Data Analyst
+        </h1>
+        <span
+          class:list={[
+            "rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset",
+            isLive
+              ? "bg-green-500/10 text-green-400 ring-green-500/25"
+              : "bg-accent-subtle text-accent-text ring-accent/25",
+          ]}
+        >
+          {isLive ? "Live" : "Examples only"}
+        </span>
+      </div>
+
+      <p class="mt-5 max-w-2xl text-lg leading-relaxed text-body">
+        Ask a question about Seattle's building-energy data in plain English and
+        an AI agent answers it — by reading the database schema, writing its own
+        SQL, running it, and explaining what came back.
+      </p>
+
+      <p class="mt-4 max-w-2xl text-sm leading-relaxed text-faint">
+        The data is the city's public benchmarking programme: every large
+        building in Seattle files its annual energy use and emissions. The agent
+        is a tool-use loop written directly against the Claude API — no
+        framework, no query templates.
+      </p>
+
+      <div class="mt-8 flex flex-wrap items-center gap-3">
+        <a
+          href="#examples"
+          class="rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-[#1a1410] transition-colors hover:bg-accent-hover"
+        >
+          See what it answered
+        </a>
+        <a
+          href={repoUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="rounded-lg border border-border-strong px-4 py-2.5 text-sm font-medium text-body transition-colors hover:border-accent hover:text-accent-text"
+        >
+          Source on GitHub
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <AgentLoop />
+  <ExampleGallery />
+  <AskPanel />
+</BaseLayout>
+
+<script>
+  import "../scripts/demo";
+</script>

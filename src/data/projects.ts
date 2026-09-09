@@ -17,12 +17,14 @@ export type Project = {
 export const projects: Project[] = [
   {
     slug: "agentic-data-analyst",
-    title: "Agentic Data-Analyst",
+    title: "Agentic Data Analyst",
     blurb:
       "An AI agent that answers natural-language questions about Seattle building-energy data — it explores the schema, writes and runs its own SQL, calls a trained model, and draws charts, self-correcting on errors. Tool-use loop built directly on the Claude API.",
     stack: ["Python", "Claude API", "SQL", "scikit-learn", "Plotly", "Cloud Run"],
-    repoUrl: "", // TODO
-    demoUrl: "", // TODO once the agent's §10 deploy is live
+    repoUrl: "https://github.com/CarlosRM25/analytics-AI-Agent-",
+    // The example gallery on /demo is real and live now; the card's status
+    // stays "building" until the Cloud Run deploy turns on "ask your own".
+    demoUrl: "/demo",
     status: "building",
   },
   {

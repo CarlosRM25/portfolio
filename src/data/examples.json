@@ -1,0 +1,144 @@
+[
+  {
+    "id": "worst-intensity",
+    "question": "In 2023, which property types had the highest median GHG emissions intensity per square foot? Only consider types with at least 20 buildings.",
+    "answer": "In 2023, **Supermarket/Grocery Stores** had by far the highest median GHG emissions intensity at **5.18 kg CO2e/sf**, followed by **Laboratories** at **4.95 kg CO2e/sf**. These two property types stand out as substantially higher than all others.\n\nHere are the top 10:\n\n| Property Type | Building Count | Median GHG Intensity (kg CO2e/sf) |\n|---|---|---|\n| Supermarket/Grocery Store | 35 | 5.18 |\n| Laboratory | 32 | 4.95 |\n| Other - Recreation | 22 | 3.62 |\n| Hotel | 78 | 1.75 |\n| Senior Living Community | 40 | 1.51 |\n| K-12 School | 145 | 1.21 |\n| Worship Facility | 61 | 1.19 |\n| College/University | 25 | 1.09 |\n| Mixed Use Property | 141 | 1.06 |\n| Other | 37 | 0.79 |\n\nThe most common property types—Multifamily Housing (1,881 buildings) and Office (454)—are among the cleanest per square foot, with medians of 0.40 and 0.38 kg CO2e/sf respectively. The intensity variation across property types is over 46-fold, reflecting fundamental differences in operations: supermarkets and labs are energy-intensive; warehouses and multifamily are relatively efficient.",
+    "sql": [
+      "\nSELECT b.primary_property_type,\n       COUNT(*) AS n,\n       median(r.ghg_emissions_intensity) AS median_kgco2e_sf\nFROM energy_records r\nJOIN buildings b USING (ose_building_id)\nWHERE r.data_year = 2023 AND r.ghg_emissions_intensity IS NOT NULL\nGROUP BY 1\nHAVING n >= 20\nORDER BY median_kgco2e_sf DESC;\n"
+    ],
+    "chart": null
+  },
+  {
+    "id": "office-trend",
+    "question": "How has the average weather-normalized site EUI for office buildings changed over time? Include a chart.",
+    "answer": "Office buildings in Seattle have achieved significant energy efficiency gains over the past decade. The average weather-normalized site EUI declined from approximately **62.6 kBtu/sf in 2015 to 44.8 kBtu/sf in 2025**—a reduction of nearly 28% over the period.\n\nThe downward trend has been especially pronounced since 2020, with a sharp drop from 57.2 kBtu/sf in 2019 to 50.0 kBtu/sf in 2020. This likely reflects the shift to remote and hybrid work patterns. Since then, the efficiency has continued to improve gradually, reaching the lowest level on record in 2025 at 44.8 kBtu/sf.\n\nThe year-over-year improvements show consistent progress, with only a minor uptick in 2022 (50.5 vs. 49.5 kBtu/sf in 2021) before resuming the downward trajectory.",
+    "sql": [
+      "\nSELECT r.data_year, AVG(r.site_eui_wn) AS avg_site_eui_wn\nFROM energy_records r\nJOIN buildings b USING (ose_building_id)\nWHERE b.primary_property_type = 'Office' AND r.site_eui_wn IS NOT NULL\nGROUP BY 1\nORDER BY 1;\n"
+    ],
+    "chart": {
+      "title": "Average Weather-Normalized Site EUI for Office Buildings (2015–2025)",
+      "xTitle": "data_year",
+      "yTitle": "avg_site_eui_wn",
+      "series": [
+        {
+          "name": "Series 1",
+          "type": "line",
+          "x": [
+            2015,
+            2016,
+            2017,
+            2018,
+            2019,
+            2020,
+            2021,
+            2022,
+            2023,
+            2024,
+            2025
+          ],
+          "y": [
+            62.628537053031174,
+            61.80353766568396,
+            60.461059984790325,
+            58.370681840647734,
+            57.16063354985068,
+            50.04522724170227,
+            49.518246441606635,
+            50.53293845490759,
+            48.7899328537226,
+            46.612045450729546,
+            44.78588235294118
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "compliance",
+    "question": "What share of annual filings are marked compliant?",
+    "answer": "**93.4% of annual filings are marked Compliant**, with 6.6% marked Not Compliant.\n\nAcross the ~38k annual energy records in the dataset:\n- **Compliant**: 35,796 filings (93.4%)\n- **Not Compliant**: 2,513 filings (6.6%)",
+    "sql": [
+      "\nSELECT compliance_status, COUNT(*) AS n,\n       ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 1) AS pct\nFROM energy_records\nWHERE compliance_status IS NOT NULL\nGROUP BY 1;\n"
+    ],
+    "chart": null
+  },
+  {
+    "id": "reporting-growth",
+    "question": "Chart how the number of buildings reporting each year has changed.",
+    "answer": "The number of buildings reporting energy data grew steadily from 2015 through 2020, then dipped slightly in 2021 before recovering and plateauing in recent years. Reporting increased from **3,068 buildings in 2015** to a peak of **3,565 in 2023**, with 2024 at 3,529 buildings. The 2021 dip (3,137) likely reflects pandemic-related disruptions to compliance filings. Overall, the mandatory reporting program has achieved relatively stable coverage of around **3,500 buildings** since 2022.",
+    "sql": [
+      "\nSELECT data_year, COUNT(DISTINCT ose_building_id) AS num_buildings\nFROM energy_records\nWHERE ghg_emissions_intensity IS NOT NULL\nGROUP BY data_year\nORDER BY data_year\n"
+    ],
+    "chart": {
+      "title": "Number of Buildings Reporting Energy Data by Year",
+      "xTitle": "data_year",
+      "yTitle": "num_buildings",
+      "series": [
+        {
+          "name": "Series 1",
+          "type": "line",
+          "x": [
+            2015,
+            2016,
+            2017,
+            2018,
+            2019,
+            2020,
+            2021,
+            2022,
+            2023,
+            2024,
+            2025
+          ],
+          "y": [
+            3068,
+            3132,
+            3203,
+            3290,
+            3356,
+            3432,
+            3137,
+            3431,
+            3565,
+            3529,
+            3332
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "neighborhood",
+    "question": "Which neighborhood has the most benchmarked buildings?",
+    "answer": "The **EAST** neighborhood has the most benchmarked buildings, with **576 buildings** in the dataset.",
+    "sql": [
+      "\nSELECT b.neighborhood, COUNT(DISTINCT b.ose_building_id) AS building_count\nFROM buildings b\nWHERE b.neighborhood IS NOT NULL\nGROUP BY b.neighborhood\nORDER BY building_count DESC\nLIMIT 1;\n"
+    ],
+    "chart": null
+  },
+  {
+    "id": "predict-office",
+    "question": "What would the model expect for a 40-year-old office building of about 200,000 square feet with no ENERGY STAR score?",
+    "answer": "The model predicts this building is **unlikely to be a high emitter** — it scores a 44% probability of exceeding the median GHG intensity for offices in its year.\n\nThis makes sense: while the 40-year age works against it (older buildings tend to be less efficient), the large floor area (200,000 sq ft = log₁₀ ~5.30) and the absence of an ENERGY STAR score (which typically means the building hasn't been formally assessed or certified) don't push it into the high-emitter category. The model assigns it a moderate risk profile.\n\n**Note:** The model generalises to genuinely new buildings at ~0.76 ROC-AUC, so these predictions are directional rather than definitive. If you can add details like number of floors, parking share, or council district, the prediction would be more refined.",
+    "sql": [],
+    "chart": null
+  },
+  {
+    "id": "multifamily-score",
+    "question": "What is the median ENERGY STAR score for Multifamily Housing buildings in 2023?",
+    "answer": "The median ENERGY STAR score for Multifamily Housing buildings in 2023 is **88**, indicating that these buildings are performing well above the national median of 50.",
+    "sql": [
+      "SELECT median(r.energy_star_score) AS median_energy_star_score\nFROM energy_records r\nJOIN buildings b USING (ose_building_id)\nWHERE b.primary_property_type = 'Multifamily Housing' \n  AND r.data_year = 2023\n  AND r.energy_star_score IS NOT NULL"
+    ],
+    "chart": null
+  },
+  {
+    "id": "top-emitters",
+    "question": "Which buildings had the highest total GHG emissions in 2023?",
+    "answer": "The top emitters in 2023 by absolute total GHG emissions are dominated by large institutional buildings and campuses, led by nursing homes, universities, and hospitals:\n\n| Building | Type | Total GHG Emissions (metric tons CO2e) |\n|----------|------|-------|\n| Sea-Mar Community Care Center (Nursing Home) | Other | 126,805 |\n| UW Seattle Campus (Master) | College/University | 119,701 |\n| Boeing Plant 2 - Campus | Mixed Use | 20,400 |\n| Waste Management Maintenance Shed, Bldg A | Other - Services | 10,188 |\n| UW Medical Center | Hospital | 9,527 |\n| Seattle Children's Hospital (Main Campus) | Hospital | 7,360 |\n\nThe nursing home and UW campus dwarf the other buildings, with emissions over 5–6 times higher than the third-place Boeing facility. This is expected because total emissions scale with both size and energy intensity—large institutions serving continuous operations (24/7 facilities like hospitals and residential care) use far more energy than typical office buildings. The rankings are dominated by campuses, hospitals, hotels, and other large or energy-intensive operations.",
+    "sql": [
+      "\nSELECT b.building_name,\n       b.address,\n       b.primary_property_type,\n       r.total_ghg_emissions,\n       r.data_year\nFROM energy_records r\nJOIN buildings b USING (ose_building_id)\nWHERE r.data_year = 2023 AND r.total_ghg_emissions IS NOT NULL\nORDER BY r.total_ghg_emissions DESC\nLIMIT 20;\n"
+    ],
+    "chart": null
+  }
+]

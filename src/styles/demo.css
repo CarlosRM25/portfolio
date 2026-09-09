@@ -1,0 +1,345 @@
+/* ---------------------------------------------------------------------------
+   /demo — styles for content that arrives as an HTML string.
+
+   The agent's answers and charts are injected with `set:html` (pre-run gallery)
+   or `innerHTML` (live answers), so Astro's scoped styles can't reach them.
+   These are global on purpose, but every rule is nested under `.answer-prose`
+   or `.chart` so nothing leaks into the rest of the site.
+   --------------------------------------------------------------------------- */
+
+.answer-prose {
+  color: var(--color-body);
+  line-height: 1.7;
+}
+
+.answer-prose > * + * {
+  margin-top: 1rem;
+}
+
+.answer-prose h4 {
+  margin-top: 1.75rem;
+  color: var(--color-heading);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.answer-prose strong {
+  color: var(--color-heading);
+  font-weight: 600;
+}
+
+.answer-prose ul,
+.answer-prose ol {
+  padding-left: 1.25rem;
+}
+
+.answer-prose ul {
+  list-style: disc;
+}
+
+.answer-prose ol {
+  list-style: decimal;
+}
+
+.answer-prose li::marker {
+  color: var(--color-faint);
+}
+
+.answer-prose li + li {
+  margin-top: 0.35rem;
+}
+
+.answer-prose code {
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--color-heading) 8%, transparent);
+  font-size: 0.9em;
+}
+
+/* Tables — from answers and from the chart data view alike. */
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+
+.table-scroll table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.table-scroll th,
+.table-scroll td {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* Header casing is left alone — the agent's column names carry units like
+   "kg CO₂e/sf" that uppercasing destroys. */
+.table-scroll thead th {
+  position: sticky;
+  top: 0;
+  background: var(--color-band);
+  color: var(--color-muted);
+  font-weight: 600;
+  font-size: 0.78rem;
+}
+
+.table-scroll tbody tr + tr td {
+  border-top: 1px solid var(--color-border);
+}
+
+.table-scroll td:not(:first-child) {
+  color: var(--color-heading);
+}
+
+/* ---------------------------------------------------------------------------
+   Charts
+   --------------------------------------------------------------------------- */
+
+.chart {
+  --chart-surface: var(--color-surface);
+  margin: 1.5rem 0 0;
+}
+
+.chart figcaption {
+  margin-bottom: 0.75rem;
+  color: var(--color-heading);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.chart-plot {
+  position: relative;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--chart-surface);
+  padding: 0.5rem 0.25rem 0.25rem;
+}
+
+.chart-plot svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  font-family: inherit;
+}
+
+.chart .grid {
+  stroke: var(--color-border);
+  stroke-width: 1;
+}
+
+.chart .tick {
+  fill: var(--color-faint);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.chart .tick-y {
+  text-anchor: end;
+}
+
+.chart .tick-x {
+  text-anchor: middle;
+}
+
+.chart .axis-title {
+  fill: var(--color-faint);
+  font-size: 11px;
+  text-anchor: middle;
+  letter-spacing: 0.02em;
+}
+
+.chart .endpoint {
+  fill: var(--color-heading);
+  font-size: 12px;
+  font-weight: 600;
+  text-anchor: end;
+}
+
+.chart .crosshair {
+  stroke: var(--color-border-strong);
+  stroke-width: 1;
+  pointer-events: none;
+}
+
+.chart-tip {
+  position: absolute;
+  z-index: 2;
+  transform: translate(-50%, -100%);
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 8px;
+  background: var(--color-canvas);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.45);
+  font-size: 0.75rem;
+  line-height: 1.45;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.chart-tip .tip-label {
+  color: var(--color-faint);
+}
+
+.chart-tip .tip-value {
+  color: var(--color-heading);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin-top: 0.75rem;
+  font-size: 0.75rem;
+  color: var(--color-muted);
+}
+
+.chart-legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.chart-legend .swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+/* Disclosures — chart data view and the SQL panel share a look. */
+.chart-data,
+.sql-panel {
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+}
+
+.chart-data > summary,
+.sql-panel > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  color: var(--color-muted);
+  cursor: pointer;
+  list-style: none;
+  transition:
+    color 150ms,
+    border-color 150ms;
+}
+
+.chart-data > summary::-webkit-details-marker,
+.sql-panel > summary::-webkit-details-marker {
+  display: none;
+}
+
+.chart-data > summary::before,
+.sql-panel > summary::before {
+  content: "▸";
+  font-size: 0.7em;
+  transition: transform 150ms;
+}
+
+.chart-data[open] > summary::before,
+.sql-panel[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+.chart-data > summary:hover,
+.sql-panel > summary:hover {
+  color: var(--color-accent-text);
+  border-color: var(--color-accent);
+}
+
+.chart-data > *:not(summary),
+.sql-panel > *:not(summary) {
+  margin-top: 0.75rem;
+}
+
+.sql-panel pre {
+  overflow-x: auto;
+  margin: 0;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: #100d0a;
+  color: #cfc6bf;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  tab-size: 2;
+}
+
+.sql-panel pre + pre {
+  margin-top: 0.5rem;
+}
+
+/* On a phone the plot is ~310px wide; squeezing a 760-unit viewBox into that
+   renders 11px axis labels at about 4px. Let the chart keep a workable width
+   and scroll sideways instead, with the labels stepped up to match. */
+@media (max-width: 640px) {
+  .chart-plot {
+    overflow-x: auto;
+  }
+
+  .chart-plot svg {
+    min-width: 600px;
+  }
+
+  .chart .tick,
+  .chart .axis-title {
+    font-size: 14px;
+  }
+
+  .chart .endpoint {
+    font-size: 15px;
+  }
+
+  /* A scroll container would clip the tooltip anyway, and there's no hover on
+     touch — "Show the numbers" is the readout here. */
+  .chart-tip {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chart-data > summary,
+  .chart-data > summary::before,
+  .sql-panel > summary,
+  .sql-panel > summary::before {
+    transition: none;
+  }
+}
+
+/* Live-answer spinner. */
+.spinner {
+  display: inline-block;
+  width: 0.9em;
+  height: 0.9em;
+  border: 2px solid var(--color-border-strong);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: demo-spin 0.8s linear infinite;
+}
+
+@keyframes demo-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 2.4s;
+  }
+}

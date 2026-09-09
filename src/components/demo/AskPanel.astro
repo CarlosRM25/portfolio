@@ -1,0 +1,139 @@
+---
+/**
+ * "Ask your own" — the live half.
+ *
+ * PUBLIC_AGENT_API_URL is inlined by Vite at build time, so which of the two
+ * states below ships is decided by the Vercel env var, not at runtime. When
+ * it's unset we say so up front instead of rendering an input that fails on
+ * submit: a form that takes a question and then refuses it is worse than no
+ * form at all.
+ */
+const API_BASE = (import.meta.env.PUBLIC_AGENT_API_URL ?? "").replace(/\/$/, "");
+
+const suggestions = [
+  "Which neighborhood has the most benchmarked buildings?",
+  "Chart total citywide GHG emissions by year",
+  "How has average office energy use changed since 2018?",
+  "What share of filings are compliant?",
+];
+
+const repoUrl = "https://github.com/CarlosRM25/analytics-AI-Agent-";
+---
+
+<section
+  id="ask"
+  aria-labelledby="ask-heading"
+  class="border-t border-border bg-band"
+>
+  <div class="mx-auto max-w-5xl px-6 py-14 md:py-20">
+    <div aria-hidden="true" class="h-0.5 w-8 rounded-full bg-accent"></div>
+    <h2
+      id="ask-heading"
+      class="mt-4 text-2xl font-semibold tracking-tight text-heading"
+    >
+      Ask your own
+    </h2>
+
+    {
+      API_BASE ? (
+        <>
+          <p class="mt-2 max-w-2xl text-muted">
+            This one is live. Your question goes to the agent running on Cloud
+            Run, which will plan, query and answer in front of you — usually in
+            10–30 seconds. There's a per-visitor limit so the demo can't run up
+            a bill.
+          </p>
+
+          <form
+            id="ask-form"
+            data-api-base={API_BASE}
+            class="mt-8 flex flex-col gap-3 sm:flex-row"
+          >
+            <label for="ask-input" class="sr-only">
+              Your question about Seattle building-energy data
+            </label>
+            <input
+              id="ask-input"
+              name="question"
+              type="text"
+              autocomplete="off"
+              required
+              placeholder="e.g. which property types have the worst emissions intensity?"
+              class="flex-1 rounded-lg border border-border-strong bg-surface px-4 py-2.5 text-sm text-body placeholder:text-faint focus-visible:border-accent"
+            />
+            <button
+              id="ask-submit"
+              type="submit"
+              class="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-[#1a1410] transition-colors hover:bg-accent-hover disabled:cursor-default disabled:opacity-50"
+            >
+              Ask
+            </button>
+          </form>
+
+          <div class="mt-4 flex flex-wrap items-center gap-2">
+            <span class="text-xs tracking-wide text-faint uppercase">Try</span>
+            {suggestions.map((text) => (
+              <button
+                type="button"
+                data-suggestion={text}
+                class="rounded-full border border-border px-3 py-1.5 text-xs text-muted transition-colors hover:border-accent hover:text-accent-text"
+              >
+                {text}
+              </button>
+            ))}
+          </div>
+
+          <div id="ask-thread" class="mt-8 flex flex-col gap-6" />
+        </>
+      ) : (
+        <>
+          <p class="mt-2 max-w-2xl text-muted">
+            Not live yet — and rather than hand you an input box that fails on
+            submit, here's the honest state of it.
+          </p>
+
+          <div class="mt-8 max-w-2xl rounded-xl border border-border bg-surface p-6">
+            <p class="text-sm leading-relaxed text-body">
+              The agent is built and containerized; what's missing is a Google
+              Cloud project to run it in. The moment it's deployed, this section
+              becomes a text box wired to the same loop that produced every
+              answer above — same tools, same database, same model.
+            </p>
+            <p class="mt-4 text-sm leading-relaxed text-muted">
+              Until then the eight examples are the real thing: actual runs,
+              actual SQL, actual output. Nothing on this page is mocked up.
+            </p>
+            <div class="mt-6 flex flex-wrap gap-4 border-t border-border pt-5 text-sm">
+              <a
+                href={repoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-1 font-medium text-accent-text underline-offset-2 hover:text-accent-hover hover:underline"
+              >
+                Read the code
+                <svg
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  class="h-3.5 w-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M7 17 17 7M8 7h9v9" />
+                </svg>
+              </a>
+              <a
+                href="#examples"
+                class="font-medium text-muted underline-offset-2 hover:text-accent-text hover:underline"
+              >
+                Back to the examples
+              </a>
+            </div>
+          </div>
+        </>
+      )
+    }
+  </div>
+</section>
