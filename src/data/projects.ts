@@ -6,7 +6,8 @@ export type Project = {
   // Optional 2:1 thumbnail shown at the top of the card — a screenshot of the
   // project's output or UI, or an architecture diagram. Put files in
   // public/projects/ and reference them as "/projects/<name>.png". Cards render
-  // with no image area until this is set.
+  // with no image area until this is set. The FCP Insight cards stay text-only
+  // by choice; their UIs aren't ours to publish.
   image?: string;
   repoUrl?: string;
   demoUrl?: string;
@@ -36,9 +37,6 @@ export const projects: Project[] = [
       "An automated pipeline that finds and scores public construction bids for a security-systems contractor. It logs into three bid boards, OCRs every spec document, and has an LLM grade each bid against editable business rules, then routes the strongest leads to the right salesperson by territory. A dashboard lets non-engineers tune the rules behind a propose-and-approve workflow.",
     stack: ["Python", "Selenium", "Flask", "Claude API", "EasyOCR", "Docker", "Azure"],
     note: "In production at FCP Insight — source is private.",
-    // Screenshot pending — save to public/projects/bid-grading-system.png, then
-    // uncomment:
-    // image: "/projects/bid-grading-system.png",
     status: "live",
   },
   {
@@ -48,9 +46,6 @@ export const projects: Project[] = [
       "A Flask microservice that turns raw timecard exports into interactive charts — sunburst views of where labor hours actually go (realized vs. utilized vs. non-billable) and worked-vs-estimated hours per job phase. Post a batch of timecards, get back an embeddable Plotly chart. Ships through a Jenkins pipeline that tests, builds, and pushes the image to AWS ECR.",
     stack: ["Python", "Flask", "pandas", "Plotly", "Docker", "Jenkins", "AWS ECR"],
     note: "In production at FCP Insight — source is private.",
-    // Screenshot pending — save to public/projects/timecard-visualizer.png, then
-    // uncomment:
-    // image: "/projects/timecard-visualizer.png",
     status: "live",
   },
 ];
