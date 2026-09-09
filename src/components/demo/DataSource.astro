@@ -1,0 +1,135 @@
+---
+/**
+ * "Where the data comes from" — the first question a sceptical reader has.
+ *
+ * Sits directly under the hero, ahead of "How it works", because "is this
+ * real?" comes before "how does it do it?". The concrete credibility anchor is
+ * the ordinance: these filings are legally mandated, not scraped or sampled, so
+ * SMC 22.920 does more work here than any adjective would.
+ *
+ * The second half answers the other half of the same question — knowing what
+ * the data *is* tells you what you can ask it, and just as usefully what you
+ * can't. Counts here are deliberately not repeated from AgentLoop's stat row.
+ */
+const facts = [
+  {
+    title: "One row is one building, one year",
+    body: "Seattle requires every non-residential and multifamily building over 20,000 sq ft to report its annual energy use and emissions, under ordinance SMC 22.920. Each filing is a row.",
+  },
+  {
+    title: "Eleven years of it",
+    body: "Data years 2015 through 2025. Coverage grows over that span — roughly 3,175 buildings reported in 2015, about 3,700 by 2024 — so counts by year reflect participation as well as the buildings themselves.",
+  },
+  {
+    title: "A snapshot, not a live feed",
+    body: "The agent queries a read-only SQLite copy baked into its container, so answers are fast and reproducible. Seattle republishes roughly annually; refreshing means re-running the ingest and redeploying.",
+  },
+];
+
+const shapes = [
+  { kind: "Compare", example: "Which property types have the worst emissions intensity?" },
+  { kind: "Trend", example: "How has office energy use changed since 2018?" },
+  { kind: "Rank", example: "Which buildings emitted the most in 2023?" },
+  { kind: "Predict", example: "What would the model expect for a 40-year-old, 200,000 sq ft office?" },
+];
+
+const DATASET_URL = "https://data.seattle.gov/d/teqw-tu6e";
+const PROGRAMME_URL =
+  "https://www.seattle.gov/environment/climate-change/buildings-and-energy/energy-benchmarking";
+---
+
+<section aria-labelledby="data-heading" class="border-t border-border">
+  <div class="page-shell py-14 md:py-20">
+    <div aria-hidden="true" class="h-0.5 w-8 rounded-full bg-accent"></div>
+    <h2
+      id="data-heading"
+      class="mt-4 text-2xl font-semibold tracking-tight text-heading"
+    >
+      Where the data comes from
+    </h2>
+    <p class="mt-2 max-w-2xl text-muted">
+      Every number on this page traces back to one public dataset — <strong
+        class="font-medium text-heading">Seattle Building Energy Benchmarking</strong
+      >, published by the City of Seattle on its open data portal. None of it is
+      synthetic, sampled or hand-picked.
+    </p>
+
+    <dl class="mt-8 grid gap-px overflow-hidden rounded-xl bg-border md:grid-cols-3">
+      {
+        facts.map((fact) => (
+          <div class="flex flex-col gap-2 bg-band p-5 md:p-6">
+            <dt class="text-base font-medium text-heading">{fact.title}</dt>
+            <dd class="text-sm leading-relaxed text-muted">{fact.body}</dd>
+          </div>
+        ))
+      }
+    </dl>
+
+    <div class="mt-6 flex flex-wrap gap-x-6 gap-y-3 text-sm">
+      <a
+        href={DATASET_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-1 font-medium text-accent-text underline-offset-2 hover:text-accent-hover hover:underline"
+      >
+        Browse the dataset yourself
+        <svg
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+          class="h-3.5 w-3.5"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M7 17 17 7M8 7h9v9" />
+        </svg>
+      </a>
+      <a
+        href={PROGRAMME_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-1 font-medium text-muted underline-offset-2 hover:text-accent-text hover:underline"
+      >
+        About the benchmarking programme
+        <svg
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+          class="h-3.5 w-3.5"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M7 17 17 7M8 7h9v9" />
+        </svg>
+      </a>
+    </div>
+
+    <h3 class="mt-12 text-base font-medium text-heading">
+      So the questions it can answer look like these
+    </h3>
+    <ul class="mt-4 grid gap-3 sm:grid-cols-2">
+      {
+        shapes.map((shape) => (
+          <li class="flex items-baseline gap-3 rounded-lg border border-border px-4 py-3">
+            <span class="shrink-0 rounded bg-accent-subtle px-1.5 py-0.5 font-mono text-xs text-accent-text">
+              {shape.kind}
+            </span>
+            <span class="text-sm leading-relaxed text-muted">{shape.example}</span>
+          </li>
+        ))
+      }
+    </ul>
+    <p
+      class="mt-4 max-w-3xl border-l-2 border-accent pl-4 text-sm leading-relaxed text-body"
+    >
+      <strong class="font-medium text-heading">What it can't do:</strong> anything
+      the filings don't record. It has no data on tenants, rents or occupancy, nothing
+      after 2025, no other cities, and no way to explain <em>why</em> a number moved
+      — only what was reported.
+    </p>
+  </div>
+</section>
