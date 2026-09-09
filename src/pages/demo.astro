@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import DataSource from "../components/demo/DataSource.astro";
 import AgentLoop from "../components/demo/AgentLoop.astro";
 import ExampleGallery from "../components/demo/ExampleGallery.astro";
 import AskPanel from "../components/demo/AskPanel.astro";
@@ -67,10 +68,13 @@ const isLive = Boolean(import.meta.env.PUBLIC_AGENT_API_URL);
       </p>
 
       <p class="mt-4 max-w-2xl text-sm leading-relaxed text-faint">
-        The data is the city's public benchmarking programme: every large
-        building in Seattle files its annual energy use and emissions. The agent
-        is a tool-use loop written directly against the Claude API — no
-        framework, no query templates.
+        The agent is a tool-use loop written directly against the Claude API —
+        no framework, no query templates. It answers from the City of Seattle's
+        public <a
+          href="#data-heading"
+          class="text-muted underline underline-offset-2 hover:text-accent-text"
+          >building energy benchmarking data</a
+        >.
       </p>
 
       <div class="mt-8 flex flex-wrap items-center gap-3">
@@ -92,6 +96,7 @@ const isLive = Boolean(import.meta.env.PUBLIC_AGENT_API_URL);
     </div>
   </section>
 
+  <DataSource />
   <AgentLoop />
   <ExampleGallery />
   <AskPanel />
