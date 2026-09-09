@@ -16,6 +16,15 @@
   margin-top: 1rem;
 }
 
+/* The page column is wide so tables and charts have room; sentences still
+   need a measure. Cap the text blocks only — .table-scroll keeps the width. */
+.answer-prose > p,
+.answer-prose > ul,
+.answer-prose > ol,
+.answer-prose > h4 {
+  max-width: 72ch;
+}
+
 .answer-prose h4 {
   margin-top: 1.75rem;
   color: var(--color-heading);
@@ -157,11 +166,35 @@
   letter-spacing: 0.02em;
 }
 
+.chart .tick-tilt {
+  fill: var(--color-faint);
+  font-size: 11px;
+  text-anchor: end;
+}
+
 .chart .endpoint {
   fill: var(--color-heading);
   font-size: 12px;
   font-weight: 600;
   text-anchor: end;
+}
+
+/* Horizontal bars label themselves, so the value sits at the bar's end. */
+.chart .bar-value {
+  fill: var(--color-body);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  text-anchor: start;
+}
+
+.chart--h .tick-y {
+  fill: var(--color-muted);
+}
+
+.chart-note {
+  margin-top: 0.6rem;
+  font-size: 0.75rem;
+  color: var(--color-faint);
 }
 
 .chart .crosshair {
@@ -296,12 +329,20 @@
     min-width: 600px;
   }
 
-  .chart .tick,
+  /* A horizontal chart spends its width on category names, so it needs more
+     of it before those names shrink out of legibility. */
+  .chart--h .chart-plot svg {
+    min-width: 720px;
+  }
+
+  /* Only upright charts get the bump: a horizontal chart reserved its left
+     gutter against an 11px label, and growing the text would overflow it. */
+  .chart--v .tick,
   .chart .axis-title {
     font-size: 14px;
   }
 
-  .chart .endpoint {
+  .chart--v .endpoint {
     font-size: 15px;
   }
 

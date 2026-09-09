@@ -33,6 +33,19 @@
 @layer base {
   :root {
     color-scheme: dark;
+
+    /* How wide the page's content column is allowed to get. Header, footer and
+       every section read this one value, so they always line up.
+
+       64rem suits the home page: it is prose and cards, and a wider column
+       would only stretch the gaps. `/demo` sets it wider on <body> — that page
+       is tables and charts, which are starved at 64rem, and its text blocks
+       are capped separately in demo.css. */
+    --page-max: 64rem;
+  }
+
+  body.page-wide {
+    --page-max: 80rem;
   }
 
   html {
@@ -74,5 +87,17 @@
     html {
       scroll-behavior: auto;
     }
+  }
+}
+
+/* The one content column. Replaces a hardcoded `mx-auto max-w-5xl px-6` so a
+   page can widen every part of itself — chrome included — by setting
+   --page-max, instead of the header and the content disagreeing. */
+@layer components {
+  .page-shell {
+    margin-inline: auto;
+    width: 100%;
+    max-width: var(--page-max);
+    padding-inline: 1.5rem;
   }
 }

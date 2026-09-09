@@ -7,8 +7,13 @@ import SiteFooter from "../components/SiteFooter.astro";
 interface Props {
   title?: string;
   description?: string;
+  /**
+   * Widen the content column (header, footer and sections together) for pages
+   * whose content is data rather than prose — see --page-max in global.css.
+   */
+  wide?: boolean;
 }
-const { title, description } = Astro.props;
+const { title, description, wide = false } = Astro.props;
 ---
 
 <!doctype html>
@@ -16,7 +21,7 @@ const { title, description } = Astro.props;
   <head>
     <BaseHead title={title} description={description} />
   </head>
-  <body class="min-h-screen bg-canvas text-body">
+  <body class:list={["min-h-screen bg-canvas text-body", wide && "page-wide"]}>
     <a
       href="#main"
       class="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[100] focus:rounded-md focus:bg-surface focus:px-3 focus:py-2 focus:text-sm focus:font-medium focus:text-heading focus:shadow-md focus:ring-2 focus:ring-accent"

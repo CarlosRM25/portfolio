@@ -12,6 +12,7 @@ const image = clean(project.image);
 const repo = clean(project.repoUrl);
 const demo = clean(project.demoUrl);
 const writeup = clean(project.writeupUrl);
+const note = clean(project.note);
 
 const statusStyles: Record<Project["status"], string> = {
   live: "bg-green-500/10 text-green-400 ring-green-500/25",
@@ -122,6 +123,12 @@ const primaryLabel = demo
             </a>
           ))}
         </div>
+      )
+    }
+
+    {
+      links.length === 0 && note && (
+        <p class="border-t border-border pt-4 text-xs text-faint">{note}</p>
       )
     }
   </div>

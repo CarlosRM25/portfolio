@@ -10,6 +10,7 @@ const isLive = Boolean(import.meta.env.PUBLIC_AGENT_API_URL);
 ---
 
 <BaseLayout
+  wide
   title="Agentic Data Analyst — Carlos Rubio-Marroquin"
   description="An AI agent that answers natural-language questions about Seattle's building-energy data — it reads the schema, writes and runs its own SQL, calls a trained model, draws charts, and corrects itself when a query fails."
 >
@@ -20,7 +21,7 @@ const isLive = Boolean(import.meta.env.PUBLIC_AGENT_API_URL);
     >
     </div>
 
-    <div class="mx-auto max-w-5xl px-6 pt-10 pb-14 md:pt-14 md:pb-20">
+    <div class="page-shell pt-10 pb-14 md:pt-14 md:pb-20">
       <a
         href="/#projects"
         class="inline-flex items-center gap-1.5 rounded-md text-sm text-muted transition-colors hover:text-accent-text"

@@ -9,9 +9,11 @@ Scoped in the architecture chat; built in focused sessions. This file covers **t
 - **Repo:** https://github.com/CarlosRM25/portfolio (`main`)
 - **Live:** https://portfolio-liart-rho-94.vercel.app — Vercel Hobby, auto-deploys on push to `main`. Random suffix because `portfolio` was taken; fine for v1 (custom domain is out of scope). Set as `site` in `astro.config.mjs`.
 
-**`/demo` shipped** (2026-09-08) — the agent's example gallery, restyled onto the site's chrome. The live "ask your own" half waits on the Cloud Run deploy. See **"The AI-agent demo"** below.
+**`/demo` shipped** (2026-09-08) — the agent's example gallery plus the live "ask your own" panel, on the site's own chrome. See **"The AI-agent demo"** below.
 
-**Next / optional:** the Flask/CI-CD card still has no `repoUrl` (a card with nothing to click); Prettier + `prettier-plugin-astro` not installed yet.
+**Agent backend deployed** (2026-09-08) — `PUBLIC_AGENT_API_URL` is set in Vercel, "ask your own" answers live, and the agent card is `status: "live"`. The placeholder Flask/CI-CD card was removed; the two FCP Insight systems replaced it.
+
+**Next / optional:** project card screenshots (`public/projects/*.png`); Prettier + `prettier-plugin-astro` not installed yet.
 
 Dev: `npm run dev` → http://localhost:4321. Node note: a transitive dep (`undici`) wants Node ≥ 22.19; local is 22.14 — warning only, build unaffected. Vercel uses its own Node.
 
@@ -59,10 +61,9 @@ portfolio/
 **Goal:** the "Agentic Data-Analyst" project card links to a `/demo` page *on this site* where a recruiter reads pre-run examples and can ask the live agent a question. The backend is a separate thing (Flask on **Google Cloud Run**, repo `CarlosRM25/analytics-AI-Agent-`, local `../analytics-agent/`). This page is a static frontend that calls it over one `fetch`.
 
 ### Current state (2026-09-08)
-**Built and shipping — gallery half only.** `/demo` exists, builds clean, and is wired to the project card. `PUBLIC_AGENT_API_URL` is unset, so the page renders the "not live yet" state of "Ask your own". See **"What was built"** below for how it differs from the original plan.
-- Agent repo is built through M9 and Dockerized, **but not deployed** — no GCP project/billing yet. The live half can't be wired until that happens; the gallery half can ship now.
-- Reference frontend already exists in the agent repo: `../analytics-agent/frontend/index.html` (self-contained vanilla-JS, offline-first) + `frontend/examples.json` (8 pre-run Q&A). **That page is the thing to port.**
-- This site: Astro 7.3, `output: 'static'`, no env vars used yet.
+**Live, both halves.** The agent is deployed on Cloud Run, `PUBLIC_AGENT_API_URL` is set in Vercel, and "ask your own" answers real questions. The gallery works with no network either way. See **"What was built"** for how the page differs from the original plan.
+- Locally `PUBLIC_AGENT_API_URL` is unset unless you put it in `.env`, so `npm run dev` shows the "Examples only" state. That is the fallback working, not a bug.
+- The agent repo's `frontend/index.html` + `frontend/examples.json` remain the reference and the source of the gallery.
 
 ### Decision — port it in (Option A)
 Build `src/pages/demo.astro` in **this** repo, restyled to match the site (BaseLayout, header/footer, `--color-accent-*`, site fonts). Do **not** deploy the agent's `frontend/` separately or iframe it — the recruiter stays on the portfolio and the demo looks like the portfolio. The agent repo's `frontend/` stays as the reference and the source of `examples.json`.
@@ -75,6 +76,7 @@ Four sections on `src/pages/demo.astro`, all on `BaseLayout` so header/footer/to
 - **Charts are inline SVG, not iframes.** The plan said `<iframe sandbox>` with the agent's `data:text/html` URI. That URI is a Plotly page that pulls ~4 MB from `cdn.plot.ly` at view time and paints on a **white** ground — it breaks the offline promise and punches white holes in a dark page. Instead:
   - `src/lib/plotly-figure.mjs` pulls the traces + layout out of that HTML (`extractFigure`).
   - `src/lib/chart-svg.mjs` draws them (`chartHTML`) — hairline grid, one accent series, endpoint label, crosshair tooltip, and a "Show the numbers" table view.
+  - **Bar charts pick their own orientation.** Named categories, or more than 8 of them, flip the chart to horizontal so each label gets a line to itself — a "top 50 buildings" answer was an unreadable smear of overlapping names as upright bars. Horizontal charts cap at `MAX_BARS` (20) rows and say so under the plot; the table view still holds every row. Upright charts tilt long labels and thin the ticks by how much room a label actually needs. Numeric categories (years) always stay upright.
   - Both run at build time for the gallery **and** in the browser for live answers, so the two look identical. If `extractFigure` ever fails on a future chart it returns `null` and the answer renders without one.
 - **The gallery is a tablist, not a stack.** Eight fully-expanded answers was ~8 screens nobody reads. Questions are a list (`role="tab"`, arrow-key navigable); one answer shows at a time. With JS off every panel is simply visible — an inline bootstrap collapses them during parse, so there's no flash.
 - **Ask your own has two build-time states.** `PUBLIC_AGENT_API_URL` decides which ships. Unset → an explanatory panel, no input (a form that accepts a question and then refuses it is worse than no form). Set → input + suggestion chips + thread. Both are in `AskPanel.astro`; there is no runtime branch and no dead JS.
@@ -95,7 +97,7 @@ The backend sets `Access-Control-Allow-Origin` to the single value of its `CORS_
 
 ### Sequencing
 1. ~~**Now:** build `/demo` with the bundled gallery working and `PUBLIC_AGENT_API_URL` unset.~~ **Done 2026-09-08.** `projects.ts` has `demoUrl: "/demo"` and `status: "building"`.
-2. **When the agent is deployed** (its runbook: `../analytics-agent/deploy/MONITORING.md` + `cloudrun.yaml`; needs a GCP project + billing): set `CORS_ALLOWED_ORIGIN` on Cloud Run → this site's prod origin; set `PUBLIC_AGENT_API_URL` in Vercel → the Cloud Run URL; redeploy the portfolio. "Ask your own" goes live. Flip the card to `status: "live"`.
+2. ~~**When the agent is deployed:** set `CORS_ALLOWED_ORIGIN` on Cloud Run, `PUBLIC_AGENT_API_URL` in Vercel, redeploy, flip the card to `status: "live"`.~~ **Done 2026-09-08.** All four are in place. The CORS coupling below still binds: change the site's domain and the Cloud Run env var has to change with it.
 3. **Keeping `examples.json` fresh:** it's generated in the agent repo (run the agent once in `DEPLOY_MODE=deployed`). Whenever it's regenerated — annual data refresh, or new example questions — re-import it here with `npm run examples` (not `cp`: the script re-extracts the charts) and commit the result.
 
 ---
@@ -131,6 +133,7 @@ Name (→ `#top`) · anchor links: Projects, About · Résumé (PDF, new tab). M
 Social icons · "Built with Astro, deployed on Vercel" · © 2026.
 
 ### Style
+- **Content width is a token, not a class.** `--page-max` in `global.css` (64rem) drives the `.page-shell` class that header, footer and every section use, so they always line up. A page widens *all* of itself by passing `wide` to `BaseLayout`, which puts `.page-wide` (80rem) on `<body>` — `/demo` does, because tables and charts are starved at 64rem. Don't reintroduce `mx-auto max-w-5xl px-6`; that made the header disagree with the content. Text keeps its own measure (`max-w-2xl`, or `72ch` on `.answer-prose` blocks) regardless of how wide the column gets.
 - Mobile-first, single breakpoint ~768px.
 - One accent color — **pick with Carlos** (default: a deep blue). Neutral grays elsewhere. System font stack or Inter.
 - Dark mode: keep it if the starter includes it; don't build from scratch for v1.
@@ -225,8 +228,7 @@ blog / project deep-dives (MDX) · building dark mode from scratch · web analyt
 - **Planning docs:** kept in-repo, **gitignored** (`Claude outputs/` in `.gitignore`). Not moved out.
 
 ## Still open / next session
-- **The Flask/CI-CD card has no links.** `repoUrl` is still `""`, so it renders as a card you can't click — the only dead end left on the main page. Either create the repo and set `repoUrl`, or drop the card until it exists.
-- **Deploy the agent**, then: `CORS_ALLOWED_ORIGIN` on Cloud Run → this site's prod origin; `PUBLIC_AGENT_API_URL` in Vercel → the Cloud Run URL; redeploy. "Ask your own" goes live and the card flips to `status: "live"`.
 - **Put `steps` in the agent's `examples.json`.** The live panel shows the tool trace (`describe_schema → run_sql → …`); the gallery can't, because the export only carries `sql` and `chart`. Adding `steps` to the export would let all eight examples show the loop too — the best single upgrade left for this page.
-- Optional: add project card thumbnails (`public/projects/*.png`, referenced via `image?`). A screenshot of a `/demo` chart is the obvious one for the agent card.
+- **Card screenshots.** The two FCP Insight cards have `image:` lines commented out waiting on a PNG in `public/projects/`; the agent card has none. A `/demo` chart is the obvious shot for the agent, and these three cards are all text right now.
+- **`make_chart` row limits are the backend's call.** The frontend caps what it *draws* at 20 rows and points at the table for the rest, but the agent still asks for 50. If a tighter default is wanted, that's `agent/prompts.py` in the agent repo, not here.
 - Optional: Prettier + `prettier-plugin-astro` aren't installed yet (formatting convention only).
