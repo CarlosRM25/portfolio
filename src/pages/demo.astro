@@ -12,8 +12,8 @@ const isLive = Boolean(import.meta.env.PUBLIC_AGENT_API_URL);
 
 <BaseLayout
   wide
-  title="Agentic Data Analyst — Carlos Rubio-Marroquin"
-  description="An AI agent that answers natural-language questions about Seattle's building-energy data — it reads the schema, writes and runs its own SQL, calls a trained model, draws charts, and corrects itself when a query fails."
+  title="Agentic Data Analyst · Carlos Rubio-Marroquin"
+  description="An AI agent that answers plain-English questions about Seattle's building-energy data. It writes and runs its own database queries, calls a trained model, draws charts, and fixes its own queries when they fail."
 >
   <section aria-labelledby="demo-heading" class="relative isolate overflow-hidden">
     <div
@@ -62,15 +62,14 @@ const isLive = Boolean(import.meta.env.PUBLIC_AGENT_API_URL);
       </div>
 
       <p class="mt-5 max-w-2xl text-lg leading-relaxed text-body">
-        Ask a question about Seattle's building-energy data in plain English and
-        an AI agent answers it — by reading the database schema, writing its own
-        SQL, running it, and explaining what came back.
+        Ask a question about Seattle's building-energy data in plain English.
+        An AI agent works out what to look up, writes the database query itself,
+        runs it, and explains what came back.
       </p>
 
       <p class="mt-4 max-w-2xl text-sm leading-relaxed text-faint">
-        The agent is a tool-use loop written directly against the Claude API —
-        no framework, no query templates. It answers from the City of Seattle's
-        public <a
+        It is built directly on the Claude API, with no agent framework and no
+        canned queries. Every answer comes from the City of Seattle's public <a
           href="#data-heading"
           class="text-muted underline underline-offset-2 hover:text-accent-text"
           >building energy benchmarking data</a

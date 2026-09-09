@@ -347,7 +347,7 @@ export function chartHTML(spec, opts = {}) {
       series: series.map((s, i) => ({
         name: series.length > 1 ? humanizeLabel(s.name) : yTitle || "Value",
         color: SERIES_COLORS[i % SERIES_COLORS.length],
-        values: s.y.map((v) => (Number.isFinite(v) ? formatValue(v) : "—")),
+        values: s.y.map((v) => (Number.isFinite(v) ? formatValue(v) : "n/a")),
       })),
     });
   }
@@ -378,7 +378,7 @@ export function chartHTML(spec, opts = {}) {
     .join("")}</tbody></table></div>`;
 
   const note = capped
-    ? `<p class="chart-note">Charting the first ${shown} of ${total} rows — all ${total} are under “Show the numbers”.</p>`
+    ? `<p class="chart-note">Charting the first ${shown} of ${total} rows. All ${total} are under “Show the numbers”.</p>`
     : "";
 
   const summary =

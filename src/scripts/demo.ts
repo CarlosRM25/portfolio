@@ -72,7 +72,7 @@ function enhanceCharts(root: ParentNode = document): void {
       const rows = config.series
         .map(
           (s) =>
-            `<div><span class="tip-value">${escapeHTML(s.values[i] ?? "—")}</span>` +
+            `<div><span class="tip-value">${escapeHTML(s.values[i] ?? "n/a")}</span>` +
             (config.series.length > 1
               ? ` <span class="tip-label">${escapeHTML(s.name)}</span>`
               : "") +
@@ -257,7 +257,7 @@ function initAsk(): void {
       } else if (data.limited || response.status === 429) {
         slot.innerHTML = noticeHTML(
           data.scope === "global"
-            ? "The demo has hit its question limit for today. Try again tomorrow — the examples above are always available."
+            ? "The demo has hit its question limit for today. Try again tomorrow. The examples above are always available."
             : "You've used up your questions for now. The examples above are always available.",
         );
       } else if (data.error) {
@@ -272,7 +272,7 @@ function initAsk(): void {
       slot.innerHTML = noticeHTML(
         aborted
           ? "That took longer than two minutes, so I stopped waiting. Try a narrower question."
-          : "Couldn't reach the agent — it may be asleep or offline. The examples above still work.",
+          : "Couldn't reach the agent. It may be asleep or offline, but the examples above still work.",
       );
     } finally {
       window.clearTimeout(timer);

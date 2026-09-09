@@ -2,7 +2,7 @@ export const profile = {
   name: "Carlos Rubio-Marroquin",
   // Adapted from the résumé summary. Finalized with Carlos: starter tagline + a seeking line.
   tagline:
-    "Data science student turning analysis into decisions — Python, SQL, and a bias for communicating clearly.",
+    "Data science student turning analysis into decisions. Python, SQL, and a bias for communicating clearly.",
   // Availability line under the tagline. Set to "" to hide it. Wording is Carlos's to tweak.
   seeking: "Seeking new-grad data & analytics roles for 2027.",
   // One-liner shown beneath the actions in the hero.

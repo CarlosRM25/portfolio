@@ -14,15 +14,15 @@
 const facts = [
   {
     title: "One row is one building, one year",
-    body: "Seattle requires every non-residential and multifamily building over 20,000 sq ft to report its annual energy use and emissions, under ordinance SMC 22.920. Each filing is a row.",
+    body: "City law makes every commercial and large apartment building over 20,000 sq ft report how much energy it used and how much it emitted, once a year. Each of those yearly reports is one row. (Seattle ordinance SMC 22.920.)",
   },
   {
     title: "Eleven years of it",
-    body: "Data years 2015 through 2025. Coverage grows over that span — roughly 3,175 buildings reported in 2015, about 3,700 by 2024 — so counts by year reflect participation as well as the buildings themselves.",
+    body: "2015 through 2025. More buildings joined the programme over that time: about 3,175 reported in 2015, about 3,700 by 2024. So when a yearly count rises, part of that is simply more buildings reporting.",
   },
   {
-    title: "A snapshot, not a live feed",
-    body: "The agent queries a read-only SQLite copy baked into its container, so answers are fast and reproducible. Seattle republishes roughly annually; refreshing means re-running the ingest and redeploying.",
+    title: "A fixed copy, not a live feed",
+    body: "The agent reads its own copy of the data rather than calling the city on every question, so answers come back fast and the same question always gives the same result. Seattle publishes new figures about once a year, and updating the demo means loading those in and redeploying it.",
   },
 ];
 
@@ -48,10 +48,10 @@ const PROGRAMME_URL =
       Where the data comes from
     </h2>
     <p class="mt-2 max-w-2xl text-muted">
-      Every number on this page traces back to one public dataset — <strong
+      Every number on this page comes from one public dataset: <strong
         class="font-medium text-heading">Seattle Building Energy Benchmarking</strong
       >, published by the City of Seattle on its open data portal. None of it is
-      synthetic, sampled or hand-picked.
+      made up, sampled or hand-picked.
     </p>
 
     <dl class="mt-8 grid gap-px overflow-hidden rounded-xl bg-border md:grid-cols-3">
@@ -127,9 +127,9 @@ const PROGRAMME_URL =
       class="mt-4 max-w-3xl border-l-2 border-accent pl-4 text-sm leading-relaxed text-body"
     >
       <strong class="font-medium text-heading">What it can't do:</strong> anything
-      the filings don't record. It has no data on tenants, rents or occupancy, nothing
-      after 2025, no other cities, and no way to explain <em>why</em> a number moved
-      — only what was reported.
+      the reports don't record. There is nothing here on tenants, rents or occupancy,
+      nothing after 2025, and no other cities. It can tell you what was reported, but
+      not <em>why</em> a number moved.
     </p>
   </div>
 </section>

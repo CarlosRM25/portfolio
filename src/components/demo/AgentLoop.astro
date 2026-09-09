@@ -9,13 +9,13 @@
 const steps = [
   {
     tools: ["list_datasets", "describe_schema"],
-    title: "Reads the schema first",
-    body: "Before writing a line of SQL it asks what tables and columns exist, so it never guesses a column name.",
+    title: "Looks up what is in the data",
+    body: "Before writing anything, it asks which tables and columns actually exist. That way it never guesses at a field that isn't there.",
   },
   {
     tools: ["run_sql"],
     title: "Writes and runs its own query",
-    body: "Composes SQL against a read-only SQLite database behind a guardrail that blocks writes and caps result size.",
+    body: "It writes the database query itself and runs it. The connection is read-only, and a guardrail limits how much any one query can pull back.",
   },
   {
     tools: ["predict"],
@@ -25,12 +25,12 @@ const steps = [
     // The repo's model card leads with both and the predict tool returns the
     // 0.76 caveat with every prediction — quoting only the flattering number
     // here would contradict the code a recruiter can go read.
-    body: "For predictive questions it hands features to a scikit-learn classifier trained on the same data instead of guessing — ROC-AUC 0.86 on a temporal split, 0.76 on a building-disjoint one, which is the number that counts for a building the model has never seen.",
+    body: "Ask what a building would emit and it hands the question to a model trained on this same data, rather than guessing. The model scores 0.86 on buildings it has seen before and 0.76 on ones it hasn't (ROC-AUC), and it passes that second number along with every prediction.",
   },
   {
     tools: ["make_chart"],
     title: "Draws a chart when a chart is the answer",
-    body: "Emits a Plotly figure when the question is about a shape or a trend rather than a single number.",
+    body: "When the answer is a trend or a comparison rather than a single number, it decides that itself and draws the chart.",
   },
 ];
 
@@ -84,9 +84,9 @@ const stats = [
       class="mt-6 max-w-3xl border-l-2 border-accent pl-4 text-sm leading-relaxed text-body"
     >
       <strong class="font-medium text-heading">And when it gets it wrong:</strong
-      > a query that errors or comes back empty goes back into the loop as an observation,
-      the model reads the error and rewrites the query. That correction step is the
-      difference between an agent and a prompt.
+      > a query that fails or comes back empty goes straight back to the model, which
+      reads the error and writes a new one. That self-correction is the difference
+      between an agent and a single prompt.
     </p>
 
     <dl
