@@ -7,7 +7,7 @@ Scoped in the architecture chat; built in focused sessions. This file covers **t
 **v1 shipped** (2026-09-06). Astro 7.3 + Tailwind v4 (`@tailwindcss/vite`, CSS-first config in `src/styles/global.css`), static output. All components + `src/data/*.ts` in place per the spec below; `npm run build` is clean. Résumé PDF, GitHub + LinkedIn URLs wired in with Carlos's real values.
 
 - **Repo:** https://github.com/CarlosRM25/portfolio (`main`)
-- **Live:** https://portfolio-liart-rho-94.vercel.app — Vercel Hobby, auto-deploys on push to `main`. Random suffix because `portfolio` was taken; fine for v1 (custom domain is out of scope). Set as `site` in `astro.config.mjs`.
+- **Live:** https://carlos-rubio-marroquin.com — custom domain on Vercel Hobby, live since 2026-09-09, auto-deploys on push to `main`. The old `portfolio-liart-rho-94.vercel.app` still resolves but 307-redirects to the apex. Set as `site` in `astro.config.mjs`; it is also the one origin the agent's `CORS_ALLOWED_ORIGIN` must match (see "The CORS coupling" below).
 
 **`/demo` shipped** (2026-09-08) — the agent's example gallery plus the live "ask your own" panel, on the site's own chrome. See **"The AI-agent demo"** below.
 
@@ -85,14 +85,15 @@ Four sections on `src/pages/demo.astro`, all on `BaseLayout` so header/footer/to
 - **Cross-page wiring:** `SiteHeader.astro` nav hrefs are now root-relative (`/#projects`, not `#projects` — a bare fragment scrolls nowhere from `/demo`) and there's a `Demo` link with `aria-current`. `ProjectCard.astro` no longer forces `target="_blank"` on every link (it would have opened `/demo` in a new tab), the whole-card link follows the demo when there is one, and the empty thumbnail placeholder is gone — two identical grey panels read as a broken site.
 
 ### How it shows up in Vercel
-- **No new Vercel project.** The existing `portfolio` project builds `main` and auto-deploys. `/demo` is just one more statically pre-rendered route → `https://portfolio-liart-rho-94.vercel.app/demo` (and any future custom domain). Build stays static — no adapter, no serverless functions, no config change.
+- **No new Vercel project.** The existing `portfolio` project builds `main` and auto-deploys. `/demo` is just one more statically pre-rendered route → `https://carlos-rubio-marroquin.com/demo`. Build stays static — no adapter, no serverless functions, no config change.
 - **Env var:** Vercel → project `portfolio` → Settings → Environment Variables → add `PUBLIC_AGENT_API_URL` for **Production** (and **Preview** if you want live calls on PR deploys). Value = the Cloud Run URL once it exists, e.g. `https://analytics-agent-xxxxx-uw.a.run.app`. `PUBLIC_`-prefixed = Vite inlines it into client JS at **build time**, so after changing it you must **redeploy** (Deployments → ⋯ → Redeploy), not just save. Not a secret — the URL is public and protected by CORS + rate limits + Turnstile on the backend.
 - **Preview deploys** get their own origin (`https://portfolio-git-<branch>-<scope>.vercel.app`). The backend allows exactly one origin (below), so live calls fail there with a CORS error — the offline gallery still works. Fine for review; don't rely on "ask your own" on previews.
 - **Cost:** Vercel side stays $0 (static). All demo spend is Cloud Run + Claude API, capped by the agent's own controls.
 
 ### The CORS coupling — one origin
-The backend sets `Access-Control-Allow-Origin` to the single value of its `CORS_ALLOWED_ORIGIN` env var. So when the agent is deployed:
-- Set `CORS_ALLOWED_ORIGIN` on Cloud Run to this site's **production** origin: `https://portfolio-liart-rho-94.vercel.app` (or the custom domain when there is one — **if the domain changes, update this on Cloud Run and redeploy the service**).
+The backend sets `Access-Control-Allow-Origin` to the single value of its `CORS_ALLOWED_ORIGIN` env var.
+- It is set on Cloud Run to this site's **production** origin: `https://carlos-rubio-marroquin.com` (updated 2026-09-09 when the custom domain went live — was the `*.vercel.app` URL). **If the domain changes again, run `gcloud run services update analytics-agent --region us-west1 --update-env-vars CORS_ALLOWED_ORIGIN=<new origin>` or `/demo`'s "ask your own" breaks.** No image rebuild needed — the update rolls a new revision on its own.
+- Because it is a single value, `www.carlos-rubio-marroquin.com` only works for live answers if it 301-redirects to the apex (Vercel's default). If `www` ever serves directly, it's a second origin the backend won't allow.
 - `localhost:4321` dev and preview deploys are not that origin → no live answers there unless you temporarily point `CORS_ALLOWED_ORIGIN` at localhost in the agent's `.env` while developing, or teach the backend an allowlist (a backend change — not planned).
 
 ### Sequencing
