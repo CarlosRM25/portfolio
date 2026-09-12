@@ -1,0 +1,67 @@
+---
+/**
+ * The hero's visual anchor (peer/boss feedback, 2026-09-11: a static portrait
+ * doesn't compete for attention; the page needs one visual/motion element that
+ * pulls the eye before the visitor reads anything).
+ *
+ * Reuses the exact chart the /demo gallery renders — ChartFigure + chart-svg
+ * draw it identically here, at build time, from the same examples.json. No
+ * screenshot to keep in sync with a future prompt/data change: if the answer
+ * changes, this card changes with it on the next build.
+ */
+import examples from "../data/examples.json";
+import ChartFigure from "./demo/ChartFigure.astro";
+
+const example = examples.find((e) => e.id === "office-trend")!;
+---
+
+<a
+  href="/demo#examples"
+  class="group relative block rounded-2xl border border-border bg-surface p-5 shadow-sm transition-colors hover:border-accent/50"
+>
+  <div
+    aria-hidden="true"
+    class="absolute -right-3 -bottom-3 -z-10 h-full w-full rounded-2xl bg-accent/15"
+  >
+  </div>
+
+  <p class="text-xs font-medium tracking-wide text-accent-text uppercase">
+    Live from the Agentic Data Analyst
+  </p>
+  <p class="mt-2 text-sm leading-snug text-body">{example.question}</p>
+
+  <div class="mt-3 hero-chart">
+    <ChartFigure spec={example.chart} />
+  </div>
+
+  <p
+    class="mt-3 flex items-center gap-1 text-sm font-medium text-accent-text"
+  >
+    Try it yourself
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      class="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
+  </p>
+</a>
+
+<style>
+  /* The gallery's chart is sized for a full demo page; scale it down and drop
+     the hover "show the numbers" affordance here — the hero card is a preview,
+     not the interactive chart itself (that's what the link is for). */
+  .hero-chart :global(svg) {
+    max-height: 220px;
+    width: 100%;
+  }
+  .hero-chart :global(details.chart-data) {
+    display: none;
+  }
+</style>
