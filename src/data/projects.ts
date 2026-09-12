@@ -6,8 +6,14 @@ export type Project = {
   // Optional 2:1 thumbnail shown at the top of the card — a screenshot of the
   // project's output or UI, or an architecture diagram. Put files in
   // public/projects/ and reference them as "/projects/<name>.png". Cards render
-  // with no image area until this is set. The FCP Insight cards stay text-only
-  // by choice; their UIs aren't ours to publish.
+  // with no image area until this is set — never point this at a file that
+  // doesn't exist yet; a missing image renders as a broken-image icon, which
+  // reads worse than no image at all.
+  //
+  // FCP Insight images: cleared by Carlos's boss (2026-09-11) to publish
+  // screenshots (and later, some code) from both systems — reversing the
+  // 2026-09-08 text-only decision. Images pending; see the TODO on each
+  // project below for the exact path to drop in.
   image?: string;
   repoUrl?: string;
   demoUrl?: string;
@@ -36,6 +42,8 @@ export const projects: Project[] = [
     blurb:
       "An automated pipeline that finds and scores public construction bids for a security-systems contractor. It logs into three bid boards, OCRs every spec document, and has an LLM grade each bid against editable business rules, then routes the strongest leads to the right salesperson by territory. A dashboard lets non-engineers tune the rules behind a propose-and-approve workflow.",
     stack: ["Python", "Selenium", "Flask", "Claude API", "EasyOCR", "Docker", "Azure"],
+    // TODO(image): drop the screenshot at public/projects/bid-grading-system.png,
+    // then add: image: "/projects/bid-grading-system.png",
     note: "In production at FCP Insight. Source is private.",
     status: "live",
   },
@@ -45,6 +53,8 @@ export const projects: Project[] = [
     blurb:
       "A Flask microservice that turns raw timecard exports into interactive charts: sunburst views of where labor hours actually go (realized vs. utilized vs. non-billable), and worked-vs-estimated hours per job phase. Post a batch of timecards, get back an embeddable Plotly chart. Ships through a Jenkins pipeline that tests, builds, and pushes the image to AWS ECR.",
     stack: ["Python", "Flask", "pandas", "Plotly", "Docker", "Jenkins", "AWS ECR"],
+    // TODO(image): drop the screenshot at public/projects/timecard-visualizer.png,
+    // then add: image: "/projects/timecard-visualizer.png",
     note: "In production at FCP Insight. Source is private.",
     status: "live",
   },
