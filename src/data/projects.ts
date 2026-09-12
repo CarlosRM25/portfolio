@@ -23,7 +23,7 @@ export const projects: Project[] = [
     slug: "agentic-data-analyst",
     title: "Agentic Data Analyst",
     blurb:
-      "An AI agent that answers plain-English questions about Seattle building-energy data. It looks up how the database is laid out, writes and runs its own SQL, calls a trained model, draws charts, and rewrites its own queries when they fail. Built directly on the Claude API, with no agent framework.",
+      "Seattle publishes its building-energy filings openly, but “open” still means a raw schema and SQL — not something you can just ask a question. This agent reads that schema, writes and runs its own SQL, and explains what came back in plain English. The core decision: when a query fails, the error goes back to the model as data instead of the app trying to patch it — it reads the actual SQLite error and rewrites its own query. The real surprise while building it: prompt caching was silently not engaging on the deployed model, both cache metrics sitting at zero with no warning; bisecting the prompt by hand to find the real cache floor cut the cost per question from $0.011 to $0.004.",
     stack: ["Python", "Claude API", "SQL", "scikit-learn", "Plotly", "Cloud Run"],
     repoUrl: "https://github.com/CarlosRM25/analytics-AI-Agent-",
     demoUrl: "/demo",

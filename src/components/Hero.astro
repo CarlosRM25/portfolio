@@ -1,5 +1,6 @@
 ---
 import { profile } from "../data/profile";
+import HeroDemo from "./HeroDemo.astro";
 import SocialLinks from "./SocialLinks.astro";
 ---
 
@@ -16,36 +17,16 @@ import SocialLinks from "./SocialLinks.astro";
 
   <div class="page-shell pt-16 pb-14 md:pt-24 md:pb-20">
     <div class="md:flex md:flex-row-reverse md:items-center md:gap-14">
-      {/* Portrait. Hidden on mobile until a real photo is set; the monogram
-          placeholder still shows on md+ so the hero stays balanced. */}
-      <div
-        class:list={[
-          "shrink-0 md:mb-0 md:block md:w-72",
-          profile.headshot ? "mb-8 w-24 sm:w-28" : "hidden",
-        ]}
-      >
-        <div class="relative">
-          <div
-            aria-hidden="true"
-            class="absolute -right-3 -bottom-3 -z-10 hidden h-full w-full rounded-2xl bg-accent/20 md:block"
-          >
-          </div>
-          {
-            profile.headshot ? (
-              <img
-                src={profile.headshot}
-                alt=""
-                width="288"
-                height="360"
-                class="aspect-[4/5] w-full rounded-2xl border border-border object-cover"
-              />
-            ) : (
-              <div class="grid aspect-[4/5] w-full place-items-center rounded-2xl border border-border bg-surface text-3xl font-semibold tracking-tight text-faint md:text-4xl">
-                cr
-              </div>
-            )
-          }
-        </div>
+      {/*
+        The hero's one visual: a live chart from the agent demo, not a
+        portrait. Peer/boss feedback (2026-09-11): attention follows size,
+        contrast and motion before text — a static headshot doesn't give a
+        first-time visitor anything to look at before they've read a word.
+        This does, and it's true rather than decorative: it's the actual
+        output of the actual project one section down.
+      */}
+      <div class="mt-10 shrink-0 md:mt-0 md:w-[22rem]">
+        <HeroDemo />
       </div>
 
       {/* Copy */}
@@ -71,22 +52,29 @@ import SocialLinks from "./SocialLinks.astro";
           )
         }
 
-        <div class="mt-8 flex flex-wrap items-center gap-3">
+        {/*
+          One primary action, not three competing ones. The demo card to the
+          side already argues for itself, so the button sends visitors to see
+          it in motion rather than repeating "view projects" — the projects
+          grid is one scroll away regardless. Résumé and the icon links are
+          still here, just no longer dressed as equal-weight buttons.
+        */}
+        <div class="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3">
           <a
-            href="#projects"
-            class="rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-[#1a1410] transition-colors hover:bg-accent-hover"
+            href="/demo"
+            class="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-[#1a1410] transition-colors hover:bg-accent-hover"
           >
-            View projects
+            Try the live demo
           </a>
           <a
             href={profile.resumePath}
             target="_blank"
             rel="noopener noreferrer"
-            class="rounded-lg border border-border-strong px-4 py-2.5 text-sm font-medium text-body transition-colors hover:border-accent hover:text-accent-text"
+            class="text-sm font-medium text-muted underline-offset-4 transition-colors hover:text-accent-text hover:underline"
           >
             Résumé
           </a>
-          <SocialLinks class="ml-1" />
+          <SocialLinks class="-ml-2" />
         </div>
 
         {
