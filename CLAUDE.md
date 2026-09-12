@@ -13,7 +13,7 @@ Scoped in the architecture chat; built in focused sessions. This file covers **t
 
 **Agent backend deployed** (2026-09-08) — `PUBLIC_AGENT_API_URL` is set in Vercel, "ask your own" answers live, and the agent card is `status: "live"`. The placeholder Flask/CI-CD card was removed; the two FCP Insight systems replaced it.
 
-**Next / optional:** a thumbnail for the agent card (`public/projects/*.png`) — the FCP Insight cards stay text-only; Prettier + `prettier-plugin-astro` not installed yet.
+**Next / optional:** thumbnails for all three project cards (`public/projects/*.png`) — FCP Insight's boss cleared images (and later, some code) from both systems on 2026-09-11, reversing the earlier text-only decision; images pending, see the TODOs in `projects.ts`. Prettier + `prettier-plugin-astro` not installed yet.
 
 Dev: `npm run dev` → http://localhost:4321. Node note: a transitive dep (`undici`) wants Node ≥ 22.19; local is 22.14 — warning only, build unaffected. Vercel uses its own Node.
 
@@ -229,6 +229,6 @@ blog / project deep-dives (MDX) · building dark mode from scratch · web analyt
 
 ## Still open / next session
 - **Put `steps` in the agent's `examples.json`.** The live panel shows the tool trace (`describe_schema → run_sql → …`); the gallery can't, because the export only carries `sql` and `chart`. Adding `steps` to the export would let all eight examples show the loop too — the best single upgrade left for this page.
-- **Card screenshots — agent card only.** A `/demo` chart would be the obvious shot. The two FCP Insight cards stay text-only by Carlos's call (2026-09-08): their UIs aren't ours to publish. Don't re-suggest thumbnails for those two.
+- **Card screenshots — all three cards now, not just the agent's.** The 2026-09-08 text-only decision for the two FCP Insight cards was reversed 2026-09-11: Carlos's boss cleared posting screenshots (and later, some code) from both systems. `image` is left unset on both in `projects.ts` (each has a TODO comment with the exact path) rather than pointed at a file that doesn't exist yet — do that only once the actual screenshot lands in `public/projects/`, since a missing image renders as a broken-image icon.
 - **`make_chart` row limits are the backend's call.** The frontend caps what it *draws* at 20 rows and points at the table for the rest, but the agent still asks for 50. If a tighter default is wanted, that's `agent/prompts.py` in the agent repo, not here.
 - Optional: Prettier + `prettier-plugin-astro` aren't installed yet (formatting convention only).

@@ -1,0 +1,9 @@
+# Drop project card screenshots here.
+#
+# Naming convention: <slug>.png, matching a project's `slug` in
+# src/data/projects.ts — e.g. bid-grading-system.png. A 2:1 aspect ratio
+# (1280x640 is a good size) fills the card's thumbnail slot cleanly; ProjectCard
+# crops with object-cover if the source is a different ratio.
+#
+# Pending as of 2026-09-11: bid-grading-system.png, timecard-visualizer.png
+# (cleared by Carlos's boss to publish — see the TODOs in projects.ts).
