@@ -1,17 +1,32 @@
 ---
 /**
- * Interactive piece for the Timecard Visualizer card (peer/boss feedback,
- * 2026-09-11: "per-project visual aids... add one supporting image per
- * project card" — for this one, an interactive rebuild reads stronger than a
- * static screenshot, since the real service's whole point is an interactive
- * chart).
+ * Interactive piece for the Timecard Visualizer project (peer/boss feedback,
+ * 2026-09-11: "per-project visual aids"; for this one, an interactive rebuild
+ * reads stronger than a static screenshot, since the real service's whole
+ * point is an interactive chart).
  *
  * Modeled on the real service's actual concept after reading its source
- * (three root buckets of labor hours -- billable, necessary-but-not-billable,
- * pure overhead -- broken into work types under each). The DATA is entirely
+ * (three root buckets of labor hours: billable, necessary-but-not-billable,
+ * pure overhead, broken into work types under each). The DATA is entirely
  * invented; see timecard-viz.mjs's header and the disclaimer below.
+ *
+ * Two variants, one component and one script, since the interaction logic
+ * (scenario switching, hover tooltips) is identical either way. Only sizing
+ * and how much explanatory text shows change:
+ * - "card" (default): the compact version embedded in the homepage project
+ *   card.
+ * - "full": the /timecard page's page-wide treatment. Carlos's own call,
+ *   2026-09-12, after the card version read too small: give this project the
+ *   same "own page" treatment as the Agentic Data Analyst's /demo, rather
+ *   than cramming the interactive piece into a project-card tile.
  */
 import { SCENARIOS, donutSVG, legendHTML } from "../lib/timecard-viz.mjs";
+
+interface Props {
+  variant?: "card" | "full";
+}
+const { variant = "card" }: Props = Astro.props;
+const isFull = variant === "full";
 
 const DEFAULT_SCENARIO = "typical";
 const initialSvg = donutSVG(DEFAULT_SCENARIO);
@@ -19,17 +34,34 @@ const { legend: initialLegend, table: initialTable } = legendHTML(DEFAULT_SCENAR
 const scenarioKeys = Object.keys(SCENARIOS);
 ---
 
-<div class="timecard-viz rounded-xl border border-border bg-band p-4" data-scenario={DEFAULT_SCENARIO}>
-  <div class="flex flex-wrap items-center justify-between gap-2">
-    <p class="text-xs font-medium tracking-wide text-accent-text uppercase">
-      Try the concept
-    </p>
-    <div class="flex gap-1.5" role="group" aria-label="Scenario">
+<div
+  class:list={[
+    "timecard-viz relative",
+    isFull ? "viz-full" : "rounded-xl border border-border bg-band p-4",
+  ]}
+  data-scenario={DEFAULT_SCENARIO}
+>
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    {
+      !isFull && (
+        <p class="text-xs font-medium tracking-wide text-accent-text uppercase">
+          Try the concept
+        </p>
+      )
+    }
+    <div
+      class:list={["flex gap-1.5", isFull && "ml-auto"]}
+      role="group"
+      aria-label="Scenario"
+    >
       {
         scenarioKeys.map((key) => (
           <button
             type="button"
-            class="scenario-btn rounded-full border border-border px-2.5 py-1 text-xs font-medium text-muted transition-colors aria-pressed:border-accent aria-pressed:bg-accent-subtle aria-pressed:text-accent-text"
+            class:list={[
+              "scenario-btn rounded-full border border-border font-medium text-muted transition-colors aria-pressed:border-accent aria-pressed:bg-accent-subtle aria-pressed:text-accent-text",
+              isFull ? "px-4 py-2 text-sm" : "px-2.5 py-1 text-xs",
+            ]}
             data-scenario={key}
             aria-pressed={key === DEFAULT_SCENARIO ? "true" : "false"}
           >
@@ -40,13 +72,24 @@ const scenarioKeys = Object.keys(SCENARIOS);
     </div>
   </div>
 
-  <div class="mt-3 flex flex-wrap items-center gap-4">
-    <div class="donut-wrap relative w-[150px] shrink-0" set:html={initialSvg} />
+  <div
+    class:list={[
+      "mt-3 flex flex-wrap items-center",
+      isFull ? "gap-10 md:flex-nowrap" : "gap-4",
+    ]}
+  >
+    <div
+      class:list={["donut-wrap relative shrink-0", isFull ? "w-full max-w-[360px]" : "w-[150px]"]}
+      set:html={initialSvg}
+    />
 
-    <ul class="donut-legend legend-slot flex-1 space-y-1.5 text-sm" set:html={initialLegend} />
+    <ul
+      class:list={["donut-legend legend-slot flex-1", isFull ? "space-y-4 text-base" : "space-y-1.5 text-sm"]}
+      set:html={initialLegend}
+    />
   </div>
 
-  <details class="mt-3 text-xs">
+  <details class="mt-3 text-xs" open={isFull}>
     <summary class="cursor-pointer text-muted hover:text-accent-text">
       Show the numbers
     </summary>
@@ -54,7 +97,7 @@ const scenarioKeys = Object.keys(SCENARIOS);
   </details>
 
   <p class="mt-3 border-t border-border pt-3 text-xs leading-relaxed text-faint">
-    Illustrative rebuild of the real chart's concept — the numbers above are
+    Illustrative rebuild of the real chart's concept. The numbers above are
     made up for this page, not FCP Insight's actual timecard data.
   </p>
 
@@ -101,7 +144,7 @@ const scenarioKeys = Object.keys(SCENARIOS);
   :global(.legend-item) {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.625rem;
   }
   :global(.swatch) {
     height: 0.625rem;
@@ -109,13 +152,37 @@ const scenarioKeys = Object.keys(SCENARIOS);
     flex-shrink: 0;
     border-radius: 9999px;
   }
+  :global(.legend-text) {
+    display: flex;
+    flex-direction: column;
+  }
   :global(.legend-label) {
     color: var(--color-body);
+    font-weight: 500;
+  }
+  /* Only the full page has room to explain each bucket; the card version
+     stays terse. */
+  :global(.legend-hint) {
+    display: none;
+    color: var(--color-faint);
+    font-size: 0.8em;
+    font-weight: 400;
+  }
+  .viz-full :global(.legend-hint) {
+    display: block;
+    margin-top: 0.15rem;
   }
   :global(.legend-value) {
     margin-left: auto;
     color: var(--color-faint);
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    padding-left: 0.75rem;
+  }
+  .viz-full :global(.legend-value) {
+    color: var(--color-heading);
+    font-weight: 600;
+    font-size: 1.05em;
   }
   .table-slot :global(table) {
     width: 100%;
@@ -173,7 +240,7 @@ const scenarioKeys = Object.keys(SCENARIOS);
       const pct = isLeaf
         ? `${el.dataset.pctParent} of its bucket · ${el.dataset.pctTotal} of the week`
         : `${el.dataset.pct} of the week`;
-      tooltip.innerHTML = `<strong class="text-heading">${label}</strong><br><span class="text-muted">${hours}h — ${pct}</span>`;
+      tooltip.innerHTML = `<strong class="text-heading">${label}</strong><br><span class="text-muted">${hours}h · ${pct}</span>`;
       tooltip.classList.remove("hidden");
       const rect = root.getBoundingClientRect();
       const px = "clientX" in evt ? (evt as PointerEvent).clientX : rect.left + rect.width / 2;

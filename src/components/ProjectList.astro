@@ -1,7 +1,6 @@
 ---
 import { projects } from "../data/projects";
 import ProjectCard from "./ProjectCard.astro";
-import TimecardMiniViz from "./TimecardMiniViz.astro";
 ---
 
 <section
@@ -23,17 +22,7 @@ import TimecardMiniViz from "./TimecardMiniViz.astro";
     </p>
 
     <div class="mt-8 grid gap-6 md:grid-cols-2">
-      {
-        projects.map((project) => (
-          <ProjectCard project={project}>
-            {project.slug === "timecard-visualizer" && (
-              <Fragment slot="extra">
-                <TimecardMiniViz />
-              </Fragment>
-            )}
-          </ProjectCard>
-        ))
-      }
+      {projects.map((project) => <ProjectCard project={project} />)}
     </div>
   </div>
 </section>

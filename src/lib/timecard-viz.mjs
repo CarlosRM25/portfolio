@@ -1,20 +1,20 @@
 /**
  * Illustrative labor-efficiency donut for the Timecard Visualizer project card.
  *
- * Modeled on the real service's actual sunburst concept (three root buckets —
- * time that was billable, time that was necessary-but-not-billable, and pure
- * overhead — broken into work types under each) after reading its source with
+ * Modeled on the real service's actual sunburst concept: three root buckets
+ * (time that was billable, time that was necessary-but-not-billable, and pure
+ * overhead), broken into work types under each, after reading its source with
  * Carlos, one repo over. The DATA below is entirely invented: three fictional
  * weekly scenarios with made-up hours for a handful of made-up work types.
  * Nothing here is FCP Insight's real timecard data, real work-type taxonomy,
- * or real numbers — see the on-card disclaimer.
+ * or real numbers; see the on-card disclaimer.
  *
  * Isomorphic like chart-svg.mjs: TimecardMiniViz.astro imports this for the
  * build-time initial render, and the same file is imported client-side to
  * redraw when a visitor switches scenarios, so both paths draw identically.
  */
 
-// Colors — validated with the dataviz skill's palette method, not eyeballed:
+// Colors, validated with the dataviz skill's palette method, not eyeballed:
 //   node validate_palette.js "#e0653a,#199e70,#3987e5" --mode dark \
 //     --surface "#26201b" --pairs all
 // PASS on all six checks (worst CVD ΔE 9.1, worst normal-vision ΔE 20.9). Slot
@@ -32,7 +32,7 @@ export const BUCKETS = [
     key: "utilized",
     label: "Utilized",
     color: "#199e70",
-    hint: "Necessary but not directly billable — diagnostics, setup.",
+    hint: "Necessary but not directly billable: diagnostics, setup.",
   },
   {
     key: "reported",
@@ -168,7 +168,7 @@ export function donutSVG(scenarioKey) {
 
   const leafPaths = leafArcs
     .map((l) => {
-      const wide = l.a1 - l.a0 > 0.35; // ~20deg — enough room for a direct label
+      const wide = l.a1 - l.a0 > 0.35; // ~20deg, enough room for a direct label
       const [lx, ly] = polar(cx, cy, (rLeafOuter + rLeafInner) / 2, (l.a0 + l.a1) / 2);
       const label = wide
         ? `<text x="${lx.toFixed(2)}" y="${ly.toFixed(2)}" text-anchor="middle" dominant-baseline="middle"
@@ -192,7 +192,7 @@ export function donutSVG(scenarioKey) {
 
 /** The legend + "show the numbers" table, kept as real DOM text (not just SVG)
  *  so the breakdown is readable without hovering and without color vision.
- *  `legend` is bare <li> markup — the caller supplies the wrapping <ul>, so
+ *  `legend` is bare <li> markup; the caller supplies the wrapping <ul>, so
  *  this can be dropped into an existing list via innerHTML without nesting
  *  a second <ul> inside it. */
 export function legendHTML(scenarioKey) {
@@ -201,7 +201,10 @@ export function legendHTML(scenarioKey) {
     .map(
       (b) => `<li class="legend-item">
         <span class="swatch" style="background:${b.color}"></span>
-        <span class="legend-label">${b.label}</span>
+        <span class="legend-text">
+          <span class="legend-label">${b.label}</span>
+          <span class="legend-hint">${b.hint}</span>
+        </span>
         <span class="legend-value">${fmtHrs(b.hours)} · ${fmtPct(b.pctTotal)}</span>
       </li>`,
     )
