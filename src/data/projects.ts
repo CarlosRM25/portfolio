@@ -3,15 +3,15 @@ export type Project = {
   title: string;
   blurb: string;
   stack: string[];
-  // Optional 2:1 thumbnail shown at the top of the card — a screenshot of the
+  // Optional 2:1 thumbnail shown at the top of the card: a screenshot of the
   // project's output or UI, or an architecture diagram. Put files in
   // public/projects/ and reference them as "/projects/<name>.png". Cards render
-  // with no image area until this is set — never point this at a file that
+  // with no image area until this is set; never point this at a file that
   // doesn't exist yet; a missing image renders as a broken-image icon, which
   // reads worse than no image at all.
   //
   // FCP Insight images: cleared by Carlos's boss (2026-09-11) to publish
-  // screenshots (and later, some code) from both systems — reversing the
+  // screenshots (and later, some code) from both systems, reversing the
   // 2026-09-08 text-only decision. Images pending; see the TODO on each
   // project below for the exact path to drop in.
   image?: string;
@@ -29,7 +29,7 @@ export const projects: Project[] = [
     slug: "agentic-data-analyst",
     title: "Agentic Data Analyst",
     blurb:
-      "Seattle publishes its building-energy filings openly, but “open” still means a raw schema and SQL — not something you can just ask a question. This agent reads that schema, writes and runs its own SQL, and explains what came back in plain English. The core decision: when a query fails, the error goes back to the model as data instead of the app trying to patch it — it reads the actual SQLite error and rewrites its own query. The real surprise while building it: prompt caching was silently not engaging on the deployed model, both cache metrics sitting at zero with no warning; bisecting the prompt by hand to find the real cache floor cut the cost per question from $0.011 to $0.004.",
+      "Seattle publishes its building-energy filings openly, but “open” still means a raw schema and SQL, not something you can just ask a question. This agent reads that schema, writes and runs its own SQL, and explains what came back in plain English. The core decision: when a query fails, the error goes back to the model as data instead of the app trying to patch it. It reads the actual SQLite error and rewrites its own query. The real surprise while building it: prompt caching was silently not engaging on the deployed model, both cache metrics sitting at zero with no warning; bisecting the prompt by hand to find the real cache floor cut the cost per question from $0.011 to $0.004.",
     stack: ["Python", "Claude API", "SQL", "scikit-learn", "Plotly", "Cloud Run"],
     repoUrl: "https://github.com/CarlosRM25/analytics-AI-Agent-",
     demoUrl: "/demo",
@@ -55,6 +55,9 @@ export const projects: Project[] = [
     stack: ["Python", "Flask", "pandas", "Plotly", "Docker", "Jenkins", "AWS ECR"],
     // TODO(image): drop the screenshot at public/projects/timecard-visualizer.png,
     // then add: image: "/projects/timecard-visualizer.png",
+    // The interactive rebuild lives on its own page (Carlos's call, 2026-09-12:
+    // the card version read too small), mirroring the agent's /demo.
+    demoUrl: "/timecard",
     note: "In production at FCP Insight. Source is private.",
     status: "live",
   },

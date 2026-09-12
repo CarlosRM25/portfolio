@@ -4,13 +4,24 @@
  * doesn't compete for attention; the page needs one visual/motion element that
  * pulls the eye before the visitor reads anything).
  *
- * Reuses the exact chart the /demo gallery renders — ChartFigure + chart-svg
+ * Reuses the exact chart the /demo gallery renders. ChartFigure + chart-svg
  * draw it identically here, at build time, from the same examples.json. No
  * screenshot to keep in sync with a future prompt/data change: if the answer
  * changes, this card changes with it on the next build.
+ *
+ * chart-svg's <text class="tick">/"endpoint"/"axis-title"> elements carry no
+ * inline fill; they rely on demo.css's `.chart .tick { fill: ... }` rules for
+ * color, and that stylesheet was only ever imported by /demo. Outside that
+ * page (here, on the homepage) those classes matched nothing, so the numbers
+ * fell back to the SVG spec's default text fill, black, against a dark card:
+ * unreadable. Importing the same stylesheet chart-svg already depends on
+ * fixes it without hand-copying its rules somewhere they can drift out of
+ * sync; demo.css's other rules are namespaced under chart, ask-panel, and
+ * sql-panel class prefixes and don't touch anything else this page renders.
  */
 import examples from "../data/examples.json";
 import ChartFigure from "./demo/ChartFigure.astro";
+import "../styles/demo.css";
 
 const example = examples.find((e) => e.id === "office-trend")!;
 ---
@@ -55,7 +66,7 @@ const example = examples.find((e) => e.id === "office-trend")!;
 
 <style>
   /* The gallery's chart is sized for a full demo page; scale it down and drop
-     the hover "show the numbers" affordance here — the hero card is a preview,
+     the hover "show the numbers" affordance here; the hero card is a preview,
      not the interactive chart itself (that's what the link is for). */
   .hero-chart :global(svg) {
     max-height: 220px;
