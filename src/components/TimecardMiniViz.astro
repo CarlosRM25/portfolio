@@ -1,0 +1,199 @@
+---
+/**
+ * Interactive piece for the Timecard Visualizer card (peer/boss feedback,
+ * 2026-09-11: "per-project visual aids... add one supporting image per
+ * project card" — for this one, an interactive rebuild reads stronger than a
+ * static screenshot, since the real service's whole point is an interactive
+ * chart).
+ *
+ * Modeled on the real service's actual concept after reading its source
+ * (three root buckets of labor hours -- billable, necessary-but-not-billable,
+ * pure overhead -- broken into work types under each). The DATA is entirely
+ * invented; see timecard-viz.mjs's header and the disclaimer below.
+ */
+import { SCENARIOS, donutSVG, legendHTML } from "../lib/timecard-viz.mjs";
+
+const DEFAULT_SCENARIO = "typical";
+const initialSvg = donutSVG(DEFAULT_SCENARIO);
+const { legend: initialLegend, table: initialTable } = legendHTML(DEFAULT_SCENARIO);
+const scenarioKeys = Object.keys(SCENARIOS);
+---
+
+<div class="timecard-viz rounded-xl border border-border bg-band p-4" data-scenario={DEFAULT_SCENARIO}>
+  <div class="flex flex-wrap items-center justify-between gap-2">
+    <p class="text-xs font-medium tracking-wide text-accent-text uppercase">
+      Try the concept
+    </p>
+    <div class="flex gap-1.5" role="group" aria-label="Scenario">
+      {
+        scenarioKeys.map((key) => (
+          <button
+            type="button"
+            class="scenario-btn rounded-full border border-border px-2.5 py-1 text-xs font-medium text-muted transition-colors aria-pressed:border-accent aria-pressed:bg-accent-subtle aria-pressed:text-accent-text"
+            data-scenario={key}
+            aria-pressed={key === DEFAULT_SCENARIO ? "true" : "false"}
+          >
+            {SCENARIOS[key].label}
+          </button>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="mt-3 flex flex-wrap items-center gap-4">
+    <div class="donut-wrap relative w-[150px] shrink-0" set:html={initialSvg} />
+
+    <ul class="donut-legend legend-slot flex-1 space-y-1.5 text-sm" set:html={initialLegend} />
+  </div>
+
+  <details class="mt-3 text-xs">
+    <summary class="cursor-pointer text-muted hover:text-accent-text">
+      Show the numbers
+    </summary>
+    <div class="table-slot mt-2 overflow-x-auto" set:html={initialTable} />
+  </details>
+
+  <p class="mt-3 border-t border-border pt-3 text-xs leading-relaxed text-faint">
+    Illustrative rebuild of the real chart's concept — the numbers above are
+    made up for this page, not FCP Insight's actual timecard data.
+  </p>
+
+  <div class="viz-tooltip pointer-events-none absolute z-10 hidden rounded-md border border-border-strong bg-surface px-2.5 py-1.5 text-xs shadow-lg">
+  </div>
+</div>
+
+<style>
+  .timecard-viz {
+    position: relative;
+  }
+  .donut-svg {
+    width: 100%;
+    height: auto;
+  }
+  .donut-svg path {
+    cursor: pointer;
+    stroke: var(--color-band);
+    stroke-width: 1.5;
+    transition: opacity 0.15s;
+  }
+  .donut-svg path:hover,
+  .donut-svg path:focus-visible {
+    opacity: 0.55 !important;
+    outline: none;
+  }
+  .donut-total {
+    fill: var(--color-heading);
+  }
+  .donut-total-label {
+    fill: var(--color-faint);
+  }
+  .leaf-label {
+    pointer-events: none;
+  }
+  :global(.donut-legend) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+  :global(.legend-item) {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  :global(.swatch) {
+    height: 0.625rem;
+    width: 0.625rem;
+    flex-shrink: 0;
+    border-radius: 9999px;
+  }
+  :global(.legend-label) {
+    color: var(--color-body);
+  }
+  :global(.legend-value) {
+    margin-left: auto;
+    color: var(--color-faint);
+    font-variant-numeric: tabular-nums;
+  }
+  .table-slot :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.75rem;
+  }
+  .table-slot :global(th),
+  .table-slot :global(td) {
+    padding: 0.25rem 0.5rem;
+    text-align: left;
+    border-top: 1px solid var(--color-border);
+    color: var(--color-muted);
+  }
+  .table-slot :global(td.num),
+  .table-slot :global(th.num) {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .table-slot :global(thead th) {
+    border-top: none;
+    color: var(--color-faint);
+  }
+</style>
+
+<script>
+  import { donutSVG, legendHTML } from "../lib/timecard-viz.mjs";
+
+  document.querySelectorAll<HTMLElement>(".timecard-viz").forEach((root) => {
+    const donutWrap = root.querySelector<HTMLElement>(".donut-wrap")!;
+    const legendSlot = root.querySelector<HTMLElement>(".legend-slot")!;
+    const tableSlot = root.querySelector<HTMLElement>(".table-slot")!;
+    const tooltip = root.querySelector<HTMLElement>(".viz-tooltip")!;
+    const buttons = root.querySelectorAll<HTMLButtonElement>(".scenario-btn");
+
+    function render(scenario: string) {
+      root.dataset.scenario = scenario;
+      donutWrap.innerHTML = donutSVG(scenario);
+      const { legend, table } = legendHTML(scenario);
+      legendSlot.innerHTML = legend;
+      tableSlot.innerHTML = table;
+      wireHover();
+    }
+
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        buttons.forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
+        render(btn.dataset.scenario!);
+      });
+    });
+
+    function showTooltip(el: SVGPathElement, evt: PointerEvent | FocusEvent) {
+      const label = el.dataset.label;
+      const hours = el.dataset.hours;
+      const isLeaf = el.dataset.kind === "leaf";
+      const pct = isLeaf
+        ? `${el.dataset.pctParent} of its bucket · ${el.dataset.pctTotal} of the week`
+        : `${el.dataset.pct} of the week`;
+      tooltip.innerHTML = `<strong class="text-heading">${label}</strong><br><span class="text-muted">${hours}h — ${pct}</span>`;
+      tooltip.classList.remove("hidden");
+      const rect = root.getBoundingClientRect();
+      const px = "clientX" in evt ? (evt as PointerEvent).clientX : rect.left + rect.width / 2;
+      const py = "clientY" in evt ? (evt as PointerEvent).clientY : rect.top;
+      tooltip.style.left = `${Math.min(px - rect.left + 12, rect.width - 160)}px`;
+      tooltip.style.top = `${py - rect.top - 8}px`;
+    }
+    function hideTooltip() {
+      tooltip.classList.add("hidden");
+    }
+
+    function wireHover() {
+      donutWrap.querySelectorAll<SVGPathElement>("path[data-label]").forEach((el) => {
+        el.addEventListener("pointermove", (e) => showTooltip(el, e));
+        el.addEventListener("pointerenter", (e) => showTooltip(el, e));
+        el.addEventListener("pointerleave", hideTooltip);
+        el.addEventListener("focus", (e) => showTooltip(el, e));
+        el.addEventListener("blur", hideTooltip);
+      });
+    }
+    wireHover();
+  });
+</script>

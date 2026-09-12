@@ -82,6 +82,12 @@ const primaryLabel = demo
 
     <p class="mt-3 text-sm leading-relaxed text-muted">{project.blurb}</p>
 
+    {/* Optional per-project extra: an interactive piece, a chart, anything
+        richer than text. Empty for every card that doesn't pass one in. */}
+    <div class="relative z-10 mt-4 empty:mt-0">
+      <slot name="extra" />
+    </div>
+
     <ul class="mt-4 flex flex-wrap gap-1.5">
       {
         project.stack.map((tech) => (
