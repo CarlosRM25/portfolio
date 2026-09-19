@@ -16,18 +16,53 @@ const { education, skills } = profile;
     About
   </h2>
 
-  <div class="mt-6 max-w-2xl space-y-4 leading-relaxed text-body">
-    <p>
-      I'm a data science student at the University of Washington working at the
-      intersection of machine learning and data visualization, with a focus on
-      turning analysis into decisions people can act on. I'm drawn to
-      mission-driven and civic technology.
-    </p>
-    <p>
-      At FCP Insight I build Python dashboards and data tooling that surface
-      operational trends and inform planning decisions. I'm looking for
-      new-grad roles where modeling and clear communication both matter.
-    </p>
+  {/*
+    The "why these projects, not generic ones" answer the peer review
+    (2026-09-11) said was the missing connective tissue. Kept specific on
+    purpose: transit, one road with no crossing, the dry season in Mexico.
+    A category label like "drawn to civic tech" is what used to be here, and
+    it could have described anyone.
+  */}
+  <div class="mt-8 sm:flex sm:items-start sm:gap-8">
+    {
+      profile.headshot && (
+        <img
+          src={profile.headshot}
+          alt=""
+          width="256"
+          height="256"
+          class="mb-6 h-28 w-28 shrink-0 rounded-2xl border border-border object-cover sm:mb-0 sm:h-32 sm:w-32"
+        />
+      )
+    }
+
+    <div class="max-w-2xl space-y-4 leading-relaxed text-body">
+      <p>
+        I'm a data science student at the University of Washington, working
+        where machine learning meets data visualization, with a focus on
+        turning analysis into decisions people can act on.
+      </p>
+      <p>
+        Seattle is where I first relied on public transit. Getting to friends,
+        to family, to the airport stopped being a problem I had to solve, and
+        that is when city planning stopped being abstract to me. An apartment
+        block and a supermarket separated by one road with no crossing is a
+        decision somebody made, and the data behind decisions like it is
+        usually public. That is what pulled me toward civic data.
+      </p>
+      <p>
+        The environmental half is closer to home. I'm from Mexico, where the
+        dry season is something you build against, and climate change keeps
+        making it harder to plan for. Building energy filings sit exactly where
+        those two interests meet, which is why the agent project runs on them
+        and not on a sample dataset.
+      </p>
+      <p>
+        At FCP Insight I build Python dashboards and data tooling that surface
+        operational trends and inform planning decisions. I'm looking for
+        new-grad roles where modeling and clear communication both matter.
+      </p>
+    </div>
   </div>
 
   <div class="mt-12 grid gap-10 sm:grid-cols-2">

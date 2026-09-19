@@ -1,0 +1,173 @@
+---
+/**
+ * Its own page, mirroring /demo's treatment (Carlos's call, 2026-09-12): the
+ * card version of the interactive donut read too small, so this project gets
+ * the same "own page" treatment as the Agentic Data Analyst rather than a
+ * cramped project-card tile.
+ *
+ * Unlike /demo, there is no live backend to call here: the real service is
+ * FCP Insight's, its source is private, and the data on this page is
+ * invented (see TimecardMiniViz.astro / timecard-viz.mjs). This page explains
+ * the real concept and lets a visitor play with an illustrative rebuild of
+ * it, rather than calling anything real.
+ */
+import BaseLayout from "../layouts/BaseLayout.astro";
+import TimecardMiniViz from "../components/TimecardMiniViz.astro";
+
+const steps = [
+  {
+    tag: "Input",
+    title: "Every timecard entry carries a work type and an hours split",
+    body: "Each row is one person, one entry: how many hours were reported, how many of those were realized (billable, on a completed job), and a flag for whether the remainder was necessary but not billable, or pure overhead.",
+  },
+  {
+    tag: "Rollup",
+    title: "Hours roll up into three buckets",
+    body: "Realized time adds to the Realized bucket. The rest splits by that one flag: Utilized for necessary-but-not-billable work, Reported for everything else. That three-way split is the whole idea; everything downstream is just ways to look at it.",
+  },
+  {
+    tag: "Sunburst",
+    title: "A sunburst renders a crew's week at a glance",
+    body: "Work-type leaves nest under each bucket, sized by hours. The real service has three variants of this chart, from a plain two-ring version up to one that breaks each bucket down by job code, for when you need to see which project actually ate the week.",
+  },
+  {
+    tag: "Variance",
+    title: "A companion chart compares worked vs. estimated hours",
+    body: "Per job phase, the taller of worked/estimated draws first and the shorter overlays on top, so a phase running over budget reads as an obviously mismatched pair of bars rather than a table you have to do the subtraction on yourself.",
+  },
+];
+---
+
+<BaseLayout
+  wide
+  title="Timecard Visualization Service · Carlos Rubio-Marroquin"
+  description="A look at the concept behind FCP Insight's timecard visualization service: how raw timecard exports become a labor-efficiency sunburst and a worked-vs-estimated variance chart, with an interactive illustrative rebuild you can try."
+>
+  <section aria-labelledby="timecard-heading" class="relative isolate overflow-hidden">
+    <div
+      aria-hidden="true"
+      class="pointer-events-none absolute -top-40 right-[-20%] -z-10 h-[30rem] w-[30rem] rounded-full bg-accent/10 blur-3xl sm:right-[-5%] md:right-[6%]"
+    >
+    </div>
+
+    <div class="page-shell pt-10 pb-14 md:pt-14 md:pb-20">
+      <a
+        href="/#projects"
+        class="inline-flex items-center gap-1.5 rounded-md text-sm text-muted transition-colors hover:text-accent-text"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+          class="h-4 w-4"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M15 18l-6-6 6-6" />
+        </svg>
+        All projects
+      </a>
+
+      <div class="mt-6 flex flex-wrap items-center gap-3">
+        <h1
+          id="timecard-heading"
+          class="text-3xl font-semibold tracking-tight text-heading md:text-4xl"
+        >
+          Timecard Visualization Service
+        </h1>
+        <span
+          class="rounded-full bg-green-500/10 px-2.5 py-1 text-xs font-medium text-green-400 ring-1 ring-inset ring-green-500/25"
+        >
+          In production at FCP Insight
+        </span>
+      </div>
+
+      <p class="mt-5 max-w-2xl text-lg leading-relaxed text-body">
+        A Flask microservice that turns raw timecard exports into two kinds of
+        chart: a sunburst showing where a crew's hours actually went, and a
+        bar chart comparing worked hours against the estimate, per job phase.
+      </p>
+
+      <p class="mt-4 max-w-2xl text-sm leading-relaxed text-faint">
+        The source is private and the real data isn't mine to publish, so what
+        follows is the concept, explained, plus an interactive rebuild below
+        with invented numbers standing in for the real thing.
+      </p>
+
+      <div class="mt-8">
+        <a
+          href="#interactive"
+          class="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-[#1a1410] transition-colors hover:bg-accent-hover"
+        >
+          Try the concept
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="how-heading" class="border-y border-border bg-band">
+    <div class="page-shell py-14 md:py-20">
+      <div aria-hidden="true" class="h-0.5 w-8 rounded-full bg-accent"></div>
+      <h2
+        id="how-heading"
+        class="mt-4 text-2xl font-semibold tracking-tight text-heading"
+      >
+        How it works
+      </h2>
+      <p class="mt-2 max-w-2xl text-muted">
+        No hand-classification, no separate approval workflow. One flag per
+        timecard entry, set at the source, drives the whole breakdown.
+      </p>
+
+      <ol class="mt-8 grid gap-px overflow-hidden rounded-xl bg-border md:grid-cols-2">
+        {
+          steps.map((step, i) => (
+            <li class="flex flex-col gap-2 bg-band p-5 md:p-6">
+              <div class="flex items-center gap-3">
+                <span class="text-xs font-semibold text-faint tabular-nums">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <code class="rounded bg-accent-subtle px-1.5 py-0.5 font-mono text-xs text-accent-text">
+                  {step.tag}
+                </code>
+              </div>
+              <h3 class="text-base font-medium text-heading">{step.title}</h3>
+              <p class="text-sm leading-relaxed text-muted">{step.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+
+      <p
+        class="mt-6 max-w-3xl border-l-2 border-accent pl-4 text-sm leading-relaxed text-body"
+      >
+        <strong class="font-medium text-heading">Why a sunburst at all:</strong>
+        {" "}a table of hours by work type answers "how much"; nesting work types
+        under Realized/Utilized/Reported answers "how much, of what kind" in
+        one shape, which is the actual question an ops manager has when they
+        open this.
+      </p>
+    </div>
+  </section>
+
+  <section id="interactive" aria-labelledby="interactive-heading" class="page-shell py-14 md:py-20">
+    <div aria-hidden="true" class="h-0.5 w-8 rounded-full bg-accent"></div>
+    <h2
+      id="interactive-heading"
+      class="mt-4 text-2xl font-semibold tracking-tight text-heading"
+    >
+      Try the concept
+    </h2>
+    <p class="mt-2 max-w-2xl text-muted">
+      Three scenarios, six work types, the same three-bucket rollup described
+      above. Hover a segment for the exact split; the numbers are invented,
+      the shape of the chart is real.
+    </p>
+
+    <div class="mt-8">
+      <TimecardMiniViz variant="full" />
+    </div>
+  </section>
+</BaseLayout>
