@@ -1,6 +1,7 @@
 ---
 import { projects } from "../data/projects";
 import ProjectCard from "./ProjectCard.astro";
+import BidPipelineDiagram from "./BidPipelineDiagram.astro";
 ---
 
 <section
@@ -16,13 +17,37 @@ import ProjectCard from "./ProjectCard.astro";
     >
       Projects
     </h2>
+    {/*
+      Answers "why these projects" at the moment a reader is looking at them,
+      rather than making them scroll to About for it. The longer personal
+      version of the same answer lives in About; this is the version tied to
+      the work itself.
+    */}
     <p class="mt-2 max-w-2xl text-muted">
-      An AI agent I built in the open, and two systems running in production at
-      work. All three turn a pile of data into something a person can act on.
+      City planning decides who can reach what, and Seattle publishes the data
+      behind those decisions. Publishing it is not the same as being able to ask
+      it a question, which is what the energy agent is for. The two FCP Insight
+      systems are the same instinct applied at work, where the data is private
+      but the problem is identical.
     </p>
 
+    {/*
+      Spelled out rather than passing a conditional into the slot, because
+      Astro.slots.has() reports true for a slot that was provided but rendered
+      nothing, which would leave an empty visual strip on the other cards.
+    */}
     <div class="mt-8 grid gap-6 md:grid-cols-2">
-      {projects.map((project) => <ProjectCard project={project} />)}
+      {
+        projects.map((project) =>
+          project.slug === "bid-grading-system" ? (
+            <ProjectCard project={project}>
+              <BidPipelineDiagram slot="visual" />
+            </ProjectCard>
+          ) : (
+            <ProjectCard project={project} />
+          ),
+        )
+      }
     </div>
   </div>
 </section>

@@ -13,6 +13,10 @@ const repo = clean(project.repoUrl);
 const demo = clean(project.demoUrl);
 const writeup = clean(project.writeupUrl);
 const note = clean(project.note);
+const mention =
+  project.mention && clean(project.mention.href) && clean(project.mention.label)
+    ? project.mention
+    : undefined;
 
 const statusStyles: Record<Project["status"], string> = {
   live: "bg-green-500/10 text-green-400 ring-green-500/25",
@@ -42,6 +46,12 @@ const primary = demo ?? repo;
 const primaryLabel = demo
   ? `Demo for ${project.title}`
   : `GitHub repository for ${project.title}`;
+
+// A card's header visual is either a file (`image`) or a component passed into
+// the `visual` slot. The slot exists for diagrams and charts we draw ourselves:
+// they read the theme tokens live and stay text rather than pixels, which a
+// PNG resampled down to the card's 476px cannot do.
+const hasVisual = Astro.slots.has("visual");
 ---
 
 <article
@@ -53,7 +63,7 @@ const primaryLabel = demo
   {/* No thumbnail, no frame; an empty placeholder panel reads as a broken
       image rather than as "screenshot pending". */}
   {
-    image && (
+    image ? (
       <img
         src={image}
         alt=""
@@ -62,6 +72,8 @@ const primaryLabel = demo
         height="320"
         class="aspect-[2/1] w-full border-b border-border object-cover"
       />
+    ) : (
+      hasVisual && <slot name="visual" />
     )
   }
 
@@ -101,7 +113,7 @@ const primaryLabel = demo
     <div class="mt-5 flex-1"></div>
 
     {
-      (links.length > 0 || note) && (
+      (links.length > 0 || note || mention) && (
         <div class="border-t border-border pt-4">
           {links.length > 0 && (
             <div class="flex flex-wrap gap-4">
@@ -138,6 +150,33 @@ const primaryLabel = demo
           {note && (
             <p class:list={["text-xs text-faint", links.length > 0 && "mt-2"]}>
               {note}
+            </p>
+          )}
+          {/* Deliberately at note size and in the muted ramp, not up in the
+              links row: someone else vouching for the work is worth showing,
+              but it should not pull a click away from the work itself. */}
+          {mention && (
+            <p class:list={["text-xs", (links.length > 0 || note) && "mt-1.5"]}>
+              <a
+                href={mention.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="relative z-10 inline-flex items-center gap-1 text-faint underline-offset-2 hover:text-accent-text hover:underline"
+              >
+                {mention.label}
+                <svg
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  class="h-3 w-3"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M7 17 17 7M8 7h9v9" />
+                </svg>
+              </a>
             </p>
           )}
         </div>

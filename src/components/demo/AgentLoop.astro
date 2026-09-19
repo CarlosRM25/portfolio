@@ -105,5 +105,20 @@ const stats = [
         ))
       }
     </dl>
+
+    {/*
+      Sits under the stat row because it explains the last number in it. This
+      is the build snag the peer review asked every project to carry: the one
+      thing that actually went wrong, which no generic summary could invent.
+      It moved here from the project card, where it ran to 120 words in a tile
+      nobody reads that much of.
+    */}
+    <p class="mt-6 max-w-3xl text-sm leading-relaxed text-muted">
+      <strong class="font-medium text-heading">That last number took work.</strong
+      > Prompt caching was silently not engaging on the deployed model: both cache
+      metrics reported zero, with no error and no warning to go on. Bisecting the
+      prompt by hand to find the real cache floor took the cost per question from
+      $0.011 down to $0.004.
+    </p>
   </div>
 </section>

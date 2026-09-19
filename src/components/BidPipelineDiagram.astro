@@ -1,0 +1,229 @@
+---
+/**
+ * Construction Bid Grading System pipeline, as the project card's visual.
+ *
+ * Ported from a Claude Design artboard (2026-09-16) rather than exported as a
+ * PNG, for two reasons: the colours are the site's own tokens, so the diagram
+ * follows the theme instead of being a snapshot of it, and text stays text,
+ * which matters because this renders at 476px wide on the home page and any
+ * rasterised version would be resampled down to mush.
+ *
+ * Three deliberate changes from the artboard:
+ *
+ * 1. No step numbers. At 476px the artboard's 10px "01" labels landed at
+ *    7.4px, below anything else on the site, so they cost vertical room
+ *    without communicating. Numbering the dashboard "05" also quietly
+ *    reasserted that it is the fifth stage of a pipeline, which is the one
+ *    thing the layout is trying to say it is not. The arrows carry the order.
+ * 2. Larger type. 18px titles and 13px mono in a 640-wide viewBox land at
+ *    13.4px and 9.7px on the card: the titles then match the card paragraph
+ *    below them, and the tool names sit at the site's smallest label size
+ *    rather than under it.
+ * 3. Every title shares a top baseline. In the artboard "Route to a
+ *    salesperson" was centred, because it is the one node with no tool name,
+ *    and the odd baseline was visible across the row.
+ *
+ * The one accent colour is spent entirely on the feedback loop, because that
+ * loop is the point: a person tunes the rules, the model does the grading.
+ * See Claude outputs/bid-grading-diagram-prompt.md for the full brief.
+ */
+
+const VB_W = 640;
+const VB_H = 320;
+
+const NODE_W = 132;
+const NODE_H = 94;
+const GAP = 20;
+const ROW_Y = 26;
+const PAD_X = 14;
+
+// Titles are pre-broken into lines: SVG text does not wrap.
+const row = [
+  { lines: ["Watch three", "bid boards"], tool: "Selenium" },
+  { lines: ["Read every", "spec PDF"], tool: "EasyOCR" },
+  { lines: ["Grade each", "bid"], tool: "Claude API" },
+  { lines: ["Route to a", "salesperson"], tool: null },
+];
+
+const dashboard = { lines: ["Sales tunes", "the rules"], tool: "Flask" };
+
+const nodeX = (i: number) => 26 + i * (NODE_W + GAP);
+const GRADE_X = nodeX(2);
+const DASH_Y = 200;
+const LOOP_X = GRADE_X + NODE_W / 2;
+const ROW_MID = ROW_Y + 47;
+
+// Text baselines inside a node, measured from its top edge.
+const TITLE_1 = 30;
+const TITLE_2 = 52;
+const TOOL_Y = 74;
+
+const label = (node: { lines: string[]; tool: string | null }, x: number, y: number) => ({
+  x: x + PAD_X,
+  t1: y + TITLE_1,
+  t2: y + TITLE_2,
+  tool: y + TOOL_Y,
+  node,
+});
+
+const cells = [
+  ...row.map((n, i) => label(n, nodeX(i), ROW_Y)),
+  label(dashboard, GRADE_X, DASH_Y),
+];
+
+const description =
+  "Pipeline diagram. A Selenium job watches three bid boards for new postings. " +
+  "EasyOCR reads every spec PDF. The Claude API grades each bid. Top leads are " +
+  "routed to a salesperson by territory. Separately, a Flask dashboard where " +
+  "sales tunes the grading rules feeds back into the grading step through a " +
+  "propose and approve workflow.";
+---
+
+<div class="bid-diagram border-b border-border">
+  <svg
+    viewBox={`0 0 ${VB_W} ${VB_H}`}
+    role="img"
+    aria-label={description}
+    preserveAspectRatio="xMidYMid meet"
+  >
+    {/* Node boxes */}
+    {
+      cells.map((cell) => (
+        <rect
+          x={cell.x - PAD_X}
+          y={cell.t1 - TITLE_1}
+          width={NODE_W}
+          height={NODE_H}
+          rx="6"
+          class="box"
+        />
+      ))
+    }
+
+    {/* Left to right connectors between the four pipeline stages */}
+    {
+      row.slice(0, -1).map((_, i) => {
+        const from = nodeX(i) + NODE_W;
+        const to = nodeX(i + 1);
+        return (
+          <g class="flow">
+            <line x1={from + 3} y1={ROW_MID} x2={to - 7} y2={ROW_MID} />
+            <path
+              d={`M${to - 1} ${ROW_MID} l-7 -4 v8 z`}
+              stroke="none"
+              class="flow-head"
+            />
+          </g>
+        );
+      })
+    }
+
+    {/* The feedback loop: the one thing wearing the accent */}
+    <g class="loop">
+      <line x1={LOOP_X} y1={DASH_Y - 6} x2={LOOP_X} y2={ROW_Y + NODE_H + 10} />
+      <path
+        d={`M${LOOP_X} ${ROW_Y + NODE_H + 2} l-5 8 h10 z`}
+        stroke="none"
+        class="loop-head"
+      />
+    </g>
+    <text x={LOOP_X + 12} y="164" class="loop-label">propose, then approve</text>
+
+    {/* Labels */}
+    {
+      cells.map((cell) => (
+        <>
+          <text x={cell.x} y={cell.t1} class="title">
+            {cell.node.lines[0]}
+          </text>
+          <text x={cell.x} y={cell.t2} class="title">
+            {cell.node.lines[1]}
+          </text>
+          {cell.node.tool && (
+            <text x={cell.x} y={cell.tool} class="tool">
+              {cell.node.tool}
+            </text>
+          )}
+        </>
+      ))
+    }
+  </svg>
+</div>
+
+<style>
+  .bid-diagram {
+    background: var(--color-surface);
+  }
+
+  .bid-diagram svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    font-family: inherit;
+  }
+
+  .box {
+    fill: var(--color-band);
+    stroke: var(--color-border);
+    stroke-width: 1;
+  }
+
+  .flow line {
+    stroke: var(--color-border-strong);
+    stroke-width: 1.5;
+  }
+
+  .flow-head {
+    fill: var(--color-border-strong);
+  }
+
+  .loop line {
+    stroke: var(--color-accent);
+    stroke-width: 1.5;
+  }
+
+  .loop-head {
+    fill: var(--color-accent);
+  }
+
+  .loop-label {
+    fill: var(--color-accent-text);
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .title {
+    fill: var(--color-heading);
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .tool {
+    fill: var(--color-muted);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 13px;
+  }
+
+  /*
+    On a phone the card is about 325px wide, so the whole viewBox renders at
+    half scale and 13px mono lands near 6px. Rather than shrink everything
+    past reading, drop the tool names and spend the room on the titles: the
+    stack chips directly below this card already list every one of them
+    (Python, Selenium, Flask, Claude API, EasyOCR, Docker, Azure), so nothing
+    is actually lost.
+  */
+  @media (max-width: 767px) {
+    .tool {
+      display: none;
+    }
+
+    .title {
+      font-size: 23px;
+    }
+
+    .loop-label {
+      font-size: 20px;
+    }
+  }
+</style>
