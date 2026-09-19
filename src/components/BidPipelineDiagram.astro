@@ -40,7 +40,11 @@ const PAD_X = 14;
 // Titles are pre-broken into lines: SVG text does not wrap.
 const row = [
   { lines: ["Watch three", "bid boards"], tool: "Selenium" },
-  { lines: ["Read every", "spec PDF"], tool: "EasyOCR" },
+  // Not "EasyOCR": OCR is the fallback, not how the step normally works. The
+  // boards served PDFs with embedded text until one switched to scans, and
+  // labelling the whole step with the OCR library contradicted the blurb
+  // underneath. Measured at 100 units against the 104 a node has room for.
+  { lines: ["Read every", "spec PDF"], tool: "text, then OCR" },
   { lines: ["Grade each", "bid"], tool: "Claude API" },
   { lines: ["Route to a", "salesperson"], tool: null },
 ];
@@ -73,7 +77,8 @@ const cells = [
 
 const description =
   "Pipeline diagram. A Selenium job watches three bid boards for new postings. " +
-  "EasyOCR reads every spec PDF. The Claude API grades each bid. Top leads are " +
+  "Every spec PDF is read by pulling out its embedded text, falling back to " +
+  "EasyOCR for scanned ones. The Claude API grades each bid. Top leads are " +
   "routed to a salesperson by territory. Separately, a Flask dashboard where " +
   "sales tunes the grading rules feeds back into the grading step through a " +
   "propose and approve workflow.";
