@@ -2,6 +2,14 @@
 import { projects } from "../data/projects";
 import ProjectCard from "./ProjectCard.astro";
 import BidPipelineDiagram from "./BidPipelineDiagram.astro";
+import AgentAnswerPreview from "./AgentAnswerPreview.astro";
+
+// Per-project header visuals, keyed by slug. Kept here rather than in
+// projects.ts so the data file stays plain data with no component imports.
+const VISUALS = {
+  "agentic-data-analyst": AgentAnswerPreview,
+  "bid-grading-system": BidPipelineDiagram,
+} as const;
 ---
 
 <section
@@ -32,21 +40,22 @@ import BidPipelineDiagram from "./BidPipelineDiagram.astro";
     </p>
 
     {/*
-      Spelled out rather than passing a conditional into the slot, because
+      Two branches rather than passing a conditional into the slot, because
       Astro.slots.has() reports true for a slot that was provided but rendered
-      nothing, which would leave an empty visual strip on the other cards.
+      nothing, which would leave an empty visual strip on cards without one.
     */}
     <div class="mt-8 grid gap-6 md:grid-cols-2">
       {
-        projects.map((project) =>
-          project.slug === "bid-grading-system" ? (
+        projects.map((project) => {
+          const Visual = VISUALS[project.slug as keyof typeof VISUALS];
+          return Visual ? (
             <ProjectCard project={project}>
-              <BidPipelineDiagram slot="visual" />
+              <Visual slot="visual" />
             </ProjectCard>
           ) : (
             <ProjectCard project={project} />
-          ),
-        )
+          );
+        })
       }
     </div>
   </div>
