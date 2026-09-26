@@ -24,6 +24,7 @@ Dev: `npm run dev` → http://localhost:4321. Node note: a transitive dep (`undi
 - Page data lives in `src/data/*.ts` (plain arrays/objects). Move to content collections only when project write-ups start.
 - Formatting: Prettier + `prettier-plugin-astro`, 2-space indent.
 - Node LTS (`node -v` ≥ 20).
+- **No em dashes in anything a visitor reads.** Carlos's call (2026-09-09). Do not swap in a hyphen or a semicolon; rewrite the sentence, usually by splitting it or using a colon. Source comments are exempt. So are the eight agent answers in `data/examples.json`: they are the model's verbatim output and the page's whole claim is that nothing on it is mocked up. Check with `grep -c — dist/index.html` (expect 0) and the same on `dist/demo/index.html` (expect 5, all inside gallery answers).
 
 ## Repo layout (target)
 ```
@@ -138,6 +139,8 @@ Name (→ `#top`) · anchor links: Projects, About · Résumé (PDF, new tab). M
 Social icons · "Built with Astro, deployed on Vercel" · © 2026.
 
 ### Style
+- **Card visuals are components, not screenshots.** Two of the three cards have one: `BidPipelineDiagram.astro` (inline SVG) and `AgentAnswerPreview.astro` (plain HTML). They go in `ProjectCard`'s `visual` slot, wired through the slug-keyed `VISUALS` map in `ProjectList.astro`. Prefer this over a PNG in `image`: the card renders at **476px**, so a raster gets resampled down, while a component reads the theme tokens and keeps its text as text. Timecard has no card visual on purpose; it sits alone in the second grid row and its interactive version lives on `/timecard`.
+- **Project card blurbs sit at roughly 80 words.** They have twice drifted past 120, which in a 476px tile is a wall nobody reads and which makes the neighbouring card look hollow. Each card carries one real decision and one real thing that went wrong (peer review, 2026-09-11); longer versions of both belong on that project's own page.
 - **Content width is a token, not a class.** `--page-max` in `global.css` (64rem) drives the `.page-shell` class that header, footer and every section use, so they always line up. A page widens *all* of itself by passing `wide` to `BaseLayout`, which puts `.page-wide` (80rem) on `<body>` — `/demo` does, because tables and charts are starved at 64rem. Don't reintroduce `mx-auto max-w-5xl px-6`; that made the header disagree with the content. Text keeps its own measure (`max-w-2xl`, or `72ch` on `.answer-prose` blocks) regardless of how wide the column gets.
 - Mobile-first, single breakpoint ~768px.
 - One accent color — **pick with Carlos** (default: a deep blue). Neutral grays elsewhere. System font stack or Inter.
@@ -233,7 +236,50 @@ blog / project deep-dives (MDX) · building dark mode from scratch · web analyt
 - **Planning docs:** kept in-repo, **gitignored** (`Claude outputs/` in `.gitignore`). Not moved out.
 
 ## Still open / next session
-- **Put `steps` in the agent's `examples.json`.** The live panel shows the tool trace (`describe_schema → run_sql → …`); the gallery can't, because the export only carries `sql` and `chart`. Adding `steps` to the export would let all eight examples show the loop too — the best single upgrade left for this page.
-- **Card visuals are components, not screenshots.** Two of the three cards have one: `BidPipelineDiagram.astro` (inline SVG) and `AgentAnswerPreview.astro` (plain HTML). They go in `ProjectCard`'s `visual` slot, wired through the slug-keyed `VISUALS` map in `ProjectList.astro`. Prefer this over a PNG in `image`: the card renders at **476px**, so a raster gets resampled down, while a component reads the theme tokens and keeps its text as text. Timecard has no card visual on purpose; it sits alone in the second grid row and its interactive version lives on `/timecard`.
-- **`make_chart` row limits are the backend's call.** The frontend caps what it *draws* at 20 rows and points at the table for the rest, but the agent still asks for 50. If a tighter default is wanted, that's `agent/prompts.py` in the agent repo, not here.
-- Optional: Prettier + `prettier-plugin-astro` aren't installed yet (formatting convention only).
+
+Ranked. Nothing here is blocking: the site is shipped and production is correct.
+
+1. **Put `steps` in the agent's `examples.json`.** The best single upgrade left,
+   and the work is in the agent repo (`CarlosRM25/analytics-AI-Agent-`), not
+   here. `/demo`'s live panel renders the tool trace
+   (`describe_schema → run_sql → run_sql → make_chart`), which is the clearest
+   evidence on the site that this is an agent and not a chatbot, and the doubled
+   `run_sql` shows a retry happening. The gallery cannot show any of it because
+   the export carries only `sql` and `chart`. Add `steps` to the export, re-run
+   `npm run examples` here, then teach `ExampleGallery.astro` to render it the
+   way `traceHTML()` in `scripts/demo.ts` already does for live answers.
+
+2. **A real `og:image`.** `public/og.png` is still the generic card from
+   `npm run og` (`scripts/generate-og.mjs`). Every link pasted into LinkedIn or a
+   message shows it. The site now has two real visuals worth using instead: the
+   agent's answer preview or its chart.
+
+3. **Run the five-second test.** The 2026-09-11 notes asked for it before
+   shipping and it never happened. Show the page to two people for five seconds,
+   then ask what he does and what they should click. Cheapest item here and the
+   only one that can confirm the hierarchy work actually landed.
+
+4. **Check `PUBLIC_AGENT_API_URL` on Vercel Preview.** If it is set for
+   Production only, every preview deploy renders `/demo`'s offline branch. The
+   copy there is now accurate either way, but live answers on PR builds need the
+   var, and the agent's single-origin CORS would still reject a preview origin.
+
+### Reference, not tasks
+- **The card visuals landed the long way round, so the git log reads oddly on
+  purpose.** PR #6 was merged holding only the first of its four commits, so the
+  other three never reached `main`. They were cherry-picked onto a fresh branch
+  and opened as PR #7, but PR #8 then merged the original
+  `hero-fixes-and-timecard-page` and got there first (2026-09-26). That merge
+  had to resolve `astro.config.mjs` and this file against the custom domain,
+  which had landed in between, and it resolved both correctly: `site` is the
+  apex domain on `main` and the deployed page's canonical URL matches. PR #7
+  was rebased down to this notes commit. Net effect: those three commits appear
+  twice in the history under different hashes, and all three are verified live.
+- **`make_chart` row limits are the backend's call.** The frontend caps what it
+  *draws* at 20 rows and points at the table view for the rest, but the agent
+  still asks for 50. A tighter default is `agent/prompts.py` in the agent repo.
+- **CORS is verified correct** as of 2026-09-26: a preflight to
+  `https://analytics-agent-gya6zluqlq-uw.a.run.app/ask` from the apex domain
+  returns `access-control-allow-origin: https://carlos-rubio-marroquin.com`.
+- Optional: Prettier + `prettier-plugin-astro` still are not installed
+  (formatting convention only). Nothing has suffered for it in five sessions.
