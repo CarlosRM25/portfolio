@@ -4,16 +4,19 @@ export type Project = {
   blurb: string;
   stack: string[];
   // Optional 2:1 thumbnail shown at the top of the card: a screenshot of the
-  // project's output or UI, or an architecture diagram. Put files in
-  // public/projects/ and reference them as "/projects/<name>.png". Cards render
-  // with no image area until this is set; never point this at a file that
-  // doesn't exist yet; a missing image renders as a broken-image icon, which
-  // reads worse than no image at all.
+  // project's output or UI. Put files in public/projects/ and reference them
+  // as "/projects/<name>.png". Never point this at a file that doesn't exist
+  // yet; a missing image renders as a broken-image icon, which reads worse
+  // than no image at all.
   //
-  // FCP Insight images: cleared by Carlos's boss (2026-09-11) to publish
-  // screenshots (and later, some code) from both systems, reversing the
-  // 2026-09-08 text-only decision. Images pending; see the TODO on each
-  // project below for the exact path to drop in.
+  // A card can instead get a drawn visual in the same slot, which is what the
+  // agent and bid cards use (see VISUALS in ProjectList.astro). Prefer that
+  // over a PNG: the card renders at 476px, so a raster gets resampled down,
+  // while a component reads the theme tokens and keeps its text as text.
+  //
+  // FCP Insight screenshots were cleared by Carlos's boss (2026-09-11),
+  // reversing the 2026-09-08 text-only decision, so a photo is allowed here
+  // if one ever beats the drawn version.
   image?: string;
   repoUrl?: string;
   demoUrl?: string;
@@ -58,8 +61,6 @@ export const projects: Project[] = [
     blurb:
       "The three bid boards are old enough that none has an API, so the pipeline logs in and reads them the way a person would. Grading rules live in the dashboard rather than in code, because a rule the sales team needs an engineer to change is a rule that goes stale. Edits run through propose and approve, so no one silently reweights everybody's leads. OCR is a later addition, a fallback for the one board that started serving scans with no text layer.",
     stack: ["Python", "Selenium", "Flask", "Claude API", "EasyOCR", "Docker", "Azure"],
-    // TODO(image): drop the screenshot at public/projects/bid-grading-system.png,
-    // then add: image: "/projects/bid-grading-system.png",
     note: "In production at FCP Insight. Source is private.",
     status: "live",
   },
@@ -73,10 +74,11 @@ export const projects: Project[] = [
     blurb:
       "Turns raw timecard exports into a sunburst of where labor hours actually go. The shape came out of a conversation with the CEO, who uses it: parts of a whole, with any wedge opening into the detail underneath. It returns an embeddable chart rather than its own page, because it had to drop into Electrolytix, the product FCP Insight already ships. It looked right in isolation and wrong once embedded, odd borders and undersized type, which is the kind of thing you only find by shipping.",
     stack: ["Python", "Flask", "pandas", "Plotly", "Docker", "Jenkins", "AWS ECR"],
-    // TODO(image): drop the screenshot at public/projects/timecard-visualizer.png,
-    // then add: image: "/projects/timecard-visualizer.png",
-    // The interactive rebuild lives on its own page (Carlos's call, 2026-09-12:
-    // the card version read too small), mirroring the agent's /demo.
+    // No card visual, unlike the other two. The interactive rebuild moved to
+    // its own page (Carlos's call, 2026-09-12: the card version read too
+    // small), mirroring the agent's /demo. This card also sits alone in the
+    // second grid row, so there is no neighbour for it to look hollow beside.
+    // Revisit only if a fourth project lands next to it.
     demoUrl: "/timecard",
     note: "In production at FCP Insight. Source is private.",
     // Carlos supplied this as an lnkd.in shortlink (2026-09-19). Stored as the
