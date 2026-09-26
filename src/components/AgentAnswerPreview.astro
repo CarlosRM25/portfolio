@@ -1,0 +1,61 @@
+---
+/**
+ * Visual for the Agentic Data Analyst card: one real question and the number
+ * it came back with.
+ *
+ * Why this and not a chart: the hero already leads with a chart from this same
+ * project, and repeating it two screens down adds nothing. What the hero does
+ * not show is the interaction, which is the actual product. A plain English
+ * question sitting directly above a hard number is the whole pitch in one
+ * glance, and it advertises what clicking through gets you.
+ *
+ * Why this and not a diagram: it sits beside BidPipelineDiagram in the same
+ * grid row, and a second box-and-arrow drawing would read as a weaker copy of
+ * the first. Type against a number is a different species entirely.
+ *
+ * Plain HTML rather than inline SVG, unlike the pipeline diagram. There is no
+ * geometry here, only text, so letting it reflow beats scaling a viewBox down:
+ * it stays at full size on a phone instead of shrinking to 0.5 scale.
+ */
+import examples from "../data/examples.json";
+
+const example = examples.find((e) => e.id === "compliance");
+if (!example) {
+  // Loud at build time rather than a silently empty card, in case a future
+  // `npm run examples` drops or renames this entry.
+  throw new Error(
+    'AgentAnswerPreview: no example with id "compliance" in src/data/examples.json',
+  );
+}
+
+/**
+ * Pulled by hand from that example's answer, which reads: "93.4% of annual
+ * filings are marked Compliant ... Compliant: 35,796 filings (93.4%) ... Not
+ * Compliant: 2,513 filings (6.6%)". 35,796 + 2,513 = 38,309, the dataset
+ * total. Recheck these two lines whenever the gallery is regenerated; the
+ * question above comes from the data file and stays in sync on its own.
+ */
+const headline = "93.4% compliant";
+const detail = "35,796 filings of 38,309";
+---
+
+<div
+  class="flex flex-col justify-center border-b border-border bg-surface p-5 md:aspect-[2/1] lg:p-6"
+>
+  <p
+    class="text-[0.65rem] font-medium tracking-wide text-accent-text uppercase"
+  >
+    Asked in plain English
+  </p>
+
+  <p class="mt-2 text-sm leading-snug font-medium text-heading lg:text-[15px]">
+    {example.question}
+  </p>
+
+  <hr class="my-3 border-border lg:my-4" />
+
+  <p class="text-2xl font-semibold tracking-tight text-heading lg:text-3xl">
+    {headline}
+  </p>
+  <p class="mt-1 text-xs text-muted">{detail}</p>
+</div>

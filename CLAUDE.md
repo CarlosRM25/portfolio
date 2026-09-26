@@ -1,7 +1,7 @@
 # Portfolio Site — build notes for Claude Code
 
 Personal portfolio for Carlos Rubio-Marroquin. **Astro** static site, deployed on **Vercel**.
-Scoped in the architecture chat; built in focused sessions. This file covers **the main page** and the **`/demo` agent page** (built 2026-09-08).
+Scoped in the architecture chat; built in focused sessions. Covers the main page and the two project pages, **`/demo`** (the agent, built 2026-09-08) and **`/timecard`** (built 2026-09-12).
 
 ## Status
 **v1 shipped** (2026-09-06). Astro 7.3 + Tailwind v4 (`@tailwindcss/vite`, CSS-first config in `src/styles/global.css`), static output. All components + `src/data/*.ts` in place per the spec below; `npm run build` is clean. Résumé PDF, GitHub + LinkedIn URLs wired in with Carlos's real values.
@@ -13,7 +13,7 @@ Scoped in the architecture chat; built in focused sessions. This file covers **t
 
 **Agent backend deployed** (2026-09-08) — `PUBLIC_AGENT_API_URL` is set in Vercel, "ask your own" answers live, and the agent card is `status: "live"`. The placeholder Flask/CI-CD card was removed; the two FCP Insight systems replaced it.
 
-**Next / optional:** thumbnails for all three project cards (`public/projects/*.png`) — FCP Insight's boss cleared images (and later, some code) from both systems on 2026-09-11, reversing the earlier text-only decision; images pending, see the TODOs in `projects.ts`. Prettier + `prettier-plugin-astro` not installed yet.
+**Next / optional:** put `steps` in the agent's `examples.json` so the gallery can show the tool trace the live panel already shows. Prettier + `prettier-plugin-astro` still not installed (formatting convention only).
 
 Dev: `npm run dev` → http://localhost:4321. Node note: a transitive dep (`undici`) wants Node ≥ 22.19; local is 22.14 — warning only, build unaffected. Vercel uses its own Node.
 
@@ -33,9 +33,13 @@ portfolio/
     layouts/BaseLayout.astro
     components/
       BaseHead.astro  SiteHeader.astro  SiteFooter.astro
-      Hero.astro  ProjectList.astro  ProjectCard.astro  About.astro  SocialLinks.astro
-      demo/AgentLoop.astro  demo/ExampleGallery.astro  demo/AskPanel.astro  demo/ChartFigure.astro
+      Hero.astro  HeroDemo.astro  ProjectList.astro  ProjectCard.astro
+      About.astro  SocialLinks.astro  TimecardMiniViz.astro
+      BidPipelineDiagram.astro  AgentAnswerPreview.astro   # card visuals
+      demo/AgentLoop.astro  demo/DataSource.astro  demo/ExampleGallery.astro
+      demo/AskPanel.astro  demo/ChartFigure.astro
     pages/demo.astro          # the agent demo
+    pages/timecard.astro      # the timecard project's own page
     lib/answer-md.ts          # the agent's Markdown subset -> HTML
     lib/plotly-figure.mjs     # Plotly data: URI -> figure spec
     lib/chart-svg.mjs         # figure spec -> inline SVG (build time + runtime)
@@ -230,6 +234,6 @@ blog / project deep-dives (MDX) · building dark mode from scratch · web analyt
 
 ## Still open / next session
 - **Put `steps` in the agent's `examples.json`.** The live panel shows the tool trace (`describe_schema → run_sql → …`); the gallery can't, because the export only carries `sql` and `chart`. Adding `steps` to the export would let all eight examples show the loop too — the best single upgrade left for this page.
-- **Card screenshots — all three cards now, not just the agent's.** The 2026-09-08 text-only decision for the two FCP Insight cards was reversed 2026-09-11: Carlos's boss cleared posting screenshots (and later, some code) from both systems. `image` is left unset on both in `projects.ts` (each has a TODO comment with the exact path) rather than pointed at a file that doesn't exist yet — do that only once the actual screenshot lands in `public/projects/`, since a missing image renders as a broken-image icon.
+- **Card visuals are components, not screenshots.** Two of the three cards have one: `BidPipelineDiagram.astro` (inline SVG) and `AgentAnswerPreview.astro` (plain HTML). They go in `ProjectCard`'s `visual` slot, wired through the slug-keyed `VISUALS` map in `ProjectList.astro`. Prefer this over a PNG in `image`: the card renders at **476px**, so a raster gets resampled down, while a component reads the theme tokens and keeps its text as text. Timecard has no card visual on purpose; it sits alone in the second grid row and its interactive version lives on `/timecard`.
 - **`make_chart` row limits are the backend's call.** The frontend caps what it *draws* at 20 rows and points at the table for the rest, but the agent still asks for 50. If a tighter default is wanted, that's `agent/prompts.py` in the agent repo, not here.
 - Optional: Prettier + `prettier-plugin-astro` aren't installed yet (formatting convention only).
