@@ -162,7 +162,7 @@ function traceHTML(steps: AskStep[]): string {
   if (!tools.length) return "";
   return (
     `<div class="mt-5 flex flex-wrap items-center gap-1.5 text-xs text-faint">` +
-    `<span class="uppercase tracking-wide">Tools called</span>` +
+    `<span>Tools called</span>` +
     tools
       .map(
         (tool) =>
@@ -187,7 +187,7 @@ function answerHTML(data: AskResponse, elapsedSeconds: string): string {
     `${elapsedSeconds}s`,
   ].filter(Boolean);
 
-  let html = `<p class="text-xs uppercase tracking-wider text-faint">Answer</p>`;
+  let html = `<p class="text-xs text-faint">Answer</p>`;
   html += `<div class="mt-3 answer-prose">${renderAnswer(data.answer ?? "(no answer)")}</div>`;
   if (figure) html += chartHTML(figure);
   html += traceHTML(steps);
@@ -228,7 +228,7 @@ function initAsk(): void {
     const exchange = document.createElement("article");
     exchange.className = "rounded-xl border border-border bg-surface p-5 md:p-7";
     exchange.innerHTML =
-      `<p class="text-xs uppercase tracking-wider text-faint">Question</p>` +
+      `<p class="text-xs text-faint">Question</p>` +
       `<p class="mt-1.5 text-base font-medium leading-relaxed text-heading">${escapeHTML(question)}</p>` +
       `<hr class="my-5 border-border" />` +
       `<div class="answer-slot" aria-live="polite">` +

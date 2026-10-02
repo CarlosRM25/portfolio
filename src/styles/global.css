@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+/* Self-hosted, not linked from a CDN: /demo's claim is that it makes no
+   external requests, and a webfont from fonts.gstatic.com would quietly
+   break that. Source Serif ships one variable file for the whole weight
+   range; IBM Plex Mono has no variable build, so we take only the two
+   weights actually used (400 for labels and code, 600 for figures). */
+@import "@fontsource-variable/source-serif-4";
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/600.css";
+
 /* ---------------------------------------------------------------------------
    Design tokens — warm dark theme
    The site is committed to a single dark look: a warm near-black ground with
@@ -12,6 +21,23 @@
    large / UI fill and pairs with near-black button text (~5.3:1).
    --------------------------------------------------------------------------- */
 @theme {
+  /* ---------------------------------------------------------------------
+     Type. Two families, split by what the words are rather than by size.
+
+     Prose is a serif because the subject is civic records: building-energy
+     filings are mandated paperwork, and the page should read like an
+     analyst's report rather than a product launch. Source Serif 4 over the
+     bookish alternatives because it was drawn for screen text at small
+     sizes, and this site is full of 13-14px card copy on a dark ground
+     where a higher-contrast face goes thin.
+
+     Mono carries everything machine-made: tool names, SQL, chart axes,
+     figures, tabular columns. Splitting the two that way means the contrast
+     between them is information, not decoration. There is no sans.
+     --------------------------------------------------------------------- */
+  --font-prose: "Source Serif 4 Variable", ui-serif, Georgia, serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
   /* Terracotta accent, tuned for a dark ground */
   --color-accent: #e0653a; /* solid fill (buttons) — pair with near-black text */
   --color-accent-hover: #f0946f; /* fill hover, brighter */
@@ -49,6 +75,10 @@
   }
 
   html {
+    font-family: var(--font-prose);
+    /* Serif on a dark ground reads lighter than it measures, so open the
+       line a little and let the optical size axis do its job. */
+    line-height: 1.6;
     scroll-behavior: smooth;
     /* clear the sticky header when jumping to an anchor */
     scroll-padding-top: 5rem;
@@ -59,6 +89,14 @@
     background-color: var(--color-canvas);
     color: var(--color-body);
     -webkit-font-smoothing: antialiased;
+  }
+
+  /* Anything the machine wrote wears the mono, wherever it appears. */
+  code,
+  pre,
+  kbd,
+  samp {
+    font-family: var(--font-mono);
   }
 
   /* Visible, consistent focus ring everywhere. */
