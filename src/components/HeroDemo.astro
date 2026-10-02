@@ -66,4 +66,22 @@ const example = examples.find((e) => e.id === "office-trend")!;
   .hero-chart :global(details.chart-data) {
     display: none;
   }
+
+  /*
+    demo.css gives charts a 600px floor below 640px wide and lets them scroll,
+    so axis values stay readable on /demo where the chart is the content and
+    you read numbers off it. In this card the chart is a hook, and that rule
+    cut it in half: 285px of 608px visible, with a scrollbar inside the hero.
+    Half a chart is not a hook. Let it scale to fit instead; the labels go
+    small, which is fine, because nobody reads values here. They tap through.
+  */
+  @media (max-width: 640px) {
+    .hero-chart :global(.chart-plot) {
+      overflow-x: visible;
+    }
+
+    .hero-chart :global(.chart-plot svg) {
+      min-width: 0;
+    }
+  }
 </style>
