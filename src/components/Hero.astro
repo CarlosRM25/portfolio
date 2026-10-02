@@ -16,19 +16,15 @@ import SocialLinks from "./SocialLinks.astro";
   </div>
 
   <div class="page-shell pt-16 pb-14 md:pt-24 md:pb-20">
-    <div class="md:flex md:flex-row-reverse md:items-center md:gap-14">
-      {/*
-        The hero's one visual: a live chart from the agent demo, not a
-        portrait. Peer/boss feedback (2026-09-11): attention follows size,
-        contrast and motion before text; a static headshot doesn't give a
-        first-time visitor anything to look at before they've read a word.
-        This does, and it's true rather than decorative: it's the actual
-        output of the actual project one section down.
-      */}
-      <div class="mt-10 shrink-0 md:mt-0 md:w-[22rem]">
-        <HeroDemo />
-      </div>
-
+    {/*
+      Copy first in the DOM, and a plain row rather than row-reverse. These
+      render identically side by side at md and up, but below the breakpoint
+      there is no flex container and the children simply stack in source
+      order. The old order put the chart card above the name, so a phone
+      visitor's first screen was a chart belonging to nobody and the name
+      started 641px down.
+    */}
+    <div class="md:flex md:items-center md:gap-14">
       {/* Copy */}
       <div class="max-w-2xl">
         <h1
@@ -82,6 +78,18 @@ import SocialLinks from "./SocialLinks.astro";
             <p class="mt-6 text-sm text-faint">{profile.context}</p>
           )
         }
+      </div>
+
+      {/*
+        The hero's one visual: a live chart from the agent demo, not a
+        portrait. Peer/boss feedback (2026-09-11): attention follows size,
+        contrast and motion before text; a static headshot doesn't give a
+        first-time visitor anything to look at before they've read a word.
+        This does, and it's true rather than decorative: it's the actual
+        output of the actual project one section down.
+      */}
+      <div class="mt-10 shrink-0 md:mt-0 md:w-[22rem]">
+        <HeroDemo />
       </div>
     </div>
   </div>
